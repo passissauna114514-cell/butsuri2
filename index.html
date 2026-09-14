@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情報有益サイト</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+        header {
+            background-color: #0056b3;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .pdf-list {
+            list-style: none;
+            padding: 0;
+        }
+        .pdf-list li {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+        .pdf-viewer {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>情報有益サイト</h1>
+        <p>役に立つ資料やPDFをまとめたサイトです</p>
+    </header>
+
+    <main>
+        <!-- PDF一覧セクション -->
+        <section class="card">
+            <h2>📑 PDF資料一覧</h2>
+            <ul class="pdf-list">
+                <li>
+                    <span>サンプル有益情報ドキュメント 1</span>
+                    <!-- target="_blank" で新しいタブで開く -->
+                    <a href="pdfs/sample.pdf" target="_blank" class="btn">PDFを開く</a>
+                </li>
+                <!-- 新しいPDFを追加したい場合はここを複製してください -->
+            </ul>
+        </section>
+
+        <!-- ページ埋め込みセクション -->
+        <section class="card">
+            <h2>🖥 ページ内で直接プレビュー</h2>
+            <p>※ スマートフォンでは正しく表示されない場合があります。その場合は上のボタンから開いてください。</p>
+            <!-- iframeを使ってサイト内にPDFを直接表示 -->
+            <iframe src="pdfs/sample.pdf" class="pdf-viewer">
+                このブラウザはPDFの埋め込み表示に対応していません。
+            </iframe>
+        </section>
+    </main>
+
+</body>
+</html>
