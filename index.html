@@ -3,94 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>情報有益サイト</title>
+    <title>情報有益サイト - 資料ライブラリ</title>
     <style>
-        body {
-            font-family: "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.6;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f6f8;
-            color: #333;
+        :root {
+            --primary: #2563eb;
+            --bg-color: #f8fafc;
+            --folder-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
         }
-        header {
-            background-color: #0056b3;
-            color: white;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        header {
             text-align: center;
-            border-radius: 8px;
             margin-bottom: 30px;
         }
-        .card {
-            background: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+            color: #0f172a;
         }
-        .pdf-list {
-            list-style: none;
-            padding: 0;
+
+        header p {
+            color: var(--text-sub);
+            margin: 0;
+            font-size: 0.95rem;
         }
-        .pdf-list li {
-            margin-bottom: 12px;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+
+        /* フォルダ（カテゴリー）のスタイル */
+        .folder {
+            background: var(--folder-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .folder[open] {
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            border-color: #cbd5e1;
+        }
+
+        /* フォルダの見出し部分（タップする場所） */
+        summary {
+            padding: 16px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.05rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            background-color: #ffffff;
+            list-style: none; /* デフォルトの三角矢印を非表示 */
         }
-        .btn {
-            background-color: #28a745;
+
+        summary::-webkit-details-marker {
+            display: none; /* Safari用矢印非表示 */
+        }
+
+        summary:hover {
+            background-color: #f1f5f9;
+        }
+
+        .folder-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* フォルダアイコン（開閉で切り替え） */
+        .folder-icon::before {
+            content: "📁";
+            font-size: 1.2rem;
+        }
+        .folder[open] .folder-icon::before {
+            content: "📂";
+        }
+
+        /* 開閉インジケータ矢印 */
+        .arrow-icon {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            transition: transform 0.2s ease;
+        }
+        .folder[open] .arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .file-count {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            font-weight: normal;
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        /* 展開されるファイル一覧 */
+        .file-list {
+            padding: 0 20px 10px 20px;
+            background-color: #fafafa;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .file-name {
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* PDF開くボタン */
+        .open-btn {
+            background-color: var(--primary);
             color: white;
             text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-weight: bold;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background-color 0.2s;
         }
-        .btn:hover {
-            background-color: #218838;
+
+        .open-btn:hover {
+            background-color: #1d4ed8;
         }
-        .pdf-viewer {
-            width: 100%;
-            height: 600px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+
+        /* スマホ向け調整 */
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            summary { padding: 14px 16px; font-size: 0.95rem; }
+            .file-list { padding: 0 16px 8px 16px; }
+            .open-btn { padding: 6px 10px; font-size: 0.8rem; }
         }
     </style>
 </head>
 <body>
 
+<div class="container">
     <header>
-        <h1>情報有益サイト</h1>
-        <p>役に立つ資料やPDFをまとめたサイトです</p>
+        <h1>📚 情報有益サイト</h1>
+        <p>カテゴリーをタップしてファイルを開いてください</p>
     </header>
 
-    <main>
-        <!-- PDF一覧セクション -->
-        <section class="card">
-            <h2>📑 PDF資料一覧</h2>
-            <ul class="pdf-list">
-                <li>
-                    <span>サンプル有益情報ドキュメント 1</span>
-                    <!-- target="_blank" で新しいタブで開く -->
-                    <a href="pdfs/sample.pdf" target="_blank" class="btn">PDFを開く</a>
-                </li>
-                <!-- 新しいPDFを追加したい場合はここを複製してください -->
-            </ul>
-        </section>
+    <!-- カテゴリー1 -->
+    <details class="folder">
+        <summary>
+            <div class="folder-title-wrap">
+                <span class="folder-icon"></span>
+                <span>ビジネス・業務効率化</span>
+                <span class="file-count">2件</span>
+            </div>
+            <span class="arrow-icon">▼</span>
+        </summary>
+        <div class="file-list">
+            <div class="file-item">
+                <div class="file-info">
+                    <span>📄</span>
+                    <span class="file-name">業務マニュアル_2024.pdf</span>
+                </div>
+                <a href="pdfs/business/業務マニュアル.pdf" target="_blank" class="open-btn">開く</a>
+            </div>
+            <div class="file-item">
+                <div class="file-info">
+                    <span>📄</span>
+                    <span class="file-name">議事録テンプレート.pdf</span>
+                </div>
+                <a href="pdfs/business/議事録テンプレート.pdf" target="_blank" class="open-btn">開く</a>
+            </div>
+        </div>
+    </details>
 
-        <!-- ページ埋め込みセクション -->
-        <section class="card">
-            <h2>🖥 ページ内で直接プレビュー</h2>
-            <p>※ スマートフォンでは正しく表示されない場合があります。その場合は上のボタンから開いてください。</p>
-            <!-- iframeを使ってサイト内にPDFを直接表示 -->
-            <iframe src="pdfs/sample.pdf" class="pdf-viewer">
-                このブラウザはPDFの埋め込み表示に対応していません。
-            </iframe>
-        </section>
-    </main>
+    <!-- カテゴリー2 -->
+    <details class="folder">
+        <summary>
+            <div class="folder-title-wrap">
+                <span class="folder-icon"></span>
+                <span>プログラミング・IT技術</span>
+                <span class="file-count">1件</span>
+            </div>
+            <span class="arrow-icon">▼</span>
+        </summary>
+        <div class="file-list">
+            <div class="file-item">
+                <div class="file-info">
+                    <span>📄</span>
+                    <span class="file-name">GitHub基本操作ガイド.pdf</span>
+                </div>
+                <a href="pdfs/tech/GitHubの使い方.pdf" target="_blank" class="open-btn">開く</a>
+            </div>
+        </div>
+    </details>
+
+    <!-- カテゴリー3 (最初から開いておきたい場合は open を付ける) -->
+    <details class="folder" open>
+        <summary>
+            <div class="folder-title-wrap">
+                <span class="folder-icon"></span>
+                <span>学習・資格対策</span>
+                <span class="file-count">1件</span>
+            </div>
+            <span class="arrow-icon">▼</span>
+        </summary>
+        <div class="file-list">
+            <div class="file-item">
+                <div class="file-info">
+                    <span>📄</span>
+                    <span class="file-name">効率的な勉強法ロードマップ.pdf</span>
+                </div>
+                <a href="pdfs/study/資格勉強法まとめ.pdf" target="_blank" class="open-btn">開く</a>
+            </div>
+        </div>
+    </details>
+
+</div>
 
 </body>
 </html>
