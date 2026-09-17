@@ -612,14 +612,12 @@
     <!-- 検索・抽出パネル -->
     <div class="filter-panel">
         <div class="filter-main-row">
-            <!-- 年度選択 -->
             <div>
                 <select id="yearSelect" class="filter-select">
                     <option value="all">すべての年度</option>
                     <option value="2025" selected>2025年度</option>
                 </select>
             </div>
-            <!-- 学年選択 -->
             <div>
                 <select id="gradeSelect" class="filter-select">
                     <option value="all">すべての学年</option>
@@ -628,23 +626,20 @@
                     <option value="3">第3学年</option>
                 </select>
             </div>
-            <!-- 科目検索 -->
             <div class="search-input-wrap">
-                <input type="text" id="searchInput" class="search-input" placeholder="科目名称で検索 (例: 数学Ⅰ, 物理基礎, 地理総合...)">
+                <input type="text" id="searchInput" class="search-input" placeholder="科目名称で検索 (例: 数学Ⅰ, 物理基礎, 保健, 家庭...)">
             </div>
         </div>
 
         <div class="filter-sub-row">
-            <!-- 考査区分タブ -->
             <div class="filter-group">
                 <span class="filter-group-label">考査:</span>
                 <button class="filter-chip active" data-term="all">全考査</button>
+                <button class="filter-chip" data-term="前期期末">前期期末</button>
                 <button class="filter-chip" data-term="前期中間">前期中間</button>
-                <button class="filter-chip" data-term="前期末">前期末</button>
                 <button class="filter-chip" data-term="後期中間">後期中間</button>
                 <button class="filter-chip" data-term="後期末">後期末</button>
             </div>
-            <!-- 教科タグ -->
             <div class="filter-group" id="categoryTabs">
                 <span class="filter-group-label">教科:</span>
                 <button class="filter-chip active" data-cat="all">全教科</button>
@@ -710,15 +705,14 @@
 </div>
 
 <script>
-    // 過去問データ (最短・最速命名ルール適用版)
-    // ファイルはすべて pdfs/ フォルダに直接保存します
+    // 過去問データ一覧 (202511=前期期末12科目, 202512=前期中間10科目)
     const archiveData = [
         {
-            id: "2025_g1_term1_mid",
+            id: "2025_g1_term1_fin",
             year: "2025",
             grade: "1",
-            term: "前期中間",
-            name: "2025年度 第1学年 前期中間考査",
+            term: "前期期末",
+            name: "2025年度 第1学年 前期期末考査",
             items: [
                 { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "pdfs/2025_1_1_数1_問.pdf", aFile: "pdfs/2025_1_1_数1_解.pdf" },
                 { name: "数学A", cat: "math", tag: "数学", qFile: "pdfs/2025_1_1_数A_問.pdf", aFile: "pdfs/2025_1_1_数A_解.pdf" },
@@ -729,15 +723,17 @@
                 { name: "物理基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_1_物基_問.pdf", aFile: "pdfs/2025_1_1_物基_解.pdf" },
                 { name: "生物基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_1_生基_問.pdf", aFile: "pdfs/2025_1_1_生基_解.pdf" },
                 { name: "地理総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_1_地総_問.pdf", aFile: "pdfs/2025_1_1_地総_解.pdf" },
-                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_1_歴総_問.pdf", aFile: "pdfs/2025_1_1_歴総_解.pdf" }
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_1_歴総_問.pdf", aFile: "pdfs/2025_1_1_歴総_解.pdf" },
+                { name: "保健", cat: "sub", tag: "保体", qFile: "pdfs/2025_1_1_保健_問.pdf", aFile: "pdfs/2025_1_1_保健_解.pdf" },
+                { name: "家庭", cat: "sub", tag: "家庭", qFile: "pdfs/2025_1_1_家庭_問.pdf", aFile: "pdfs/2025_1_1_家庭_解.pdf" }
             ]
         },
         {
-            id: "2025_g1_term1_fin",
+            id: "2025_g1_term1_mid",
             year: "2025",
             grade: "1",
-            term: "前期末",
-            name: "2025年度 第1学年 前期末考査",
+            term: "前期中間",
+            name: "2025年度 第1学年 前期中間考査",
             items: [
                 { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "pdfs/2025_1_2_数1_問.pdf", aFile: "pdfs/2025_1_2_数1_解.pdf" },
                 { name: "数学A", cat: "math", tag: "数学", qFile: "pdfs/2025_1_2_数A_問.pdf", aFile: "pdfs/2025_1_2_数A_解.pdf" },
@@ -748,9 +744,7 @@
                 { name: "物理基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_2_物基_問.pdf", aFile: "pdfs/2025_1_2_物基_解.pdf" },
                 { name: "生物基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_2_生基_問.pdf", aFile: "pdfs/2025_1_2_生基_解.pdf" },
                 { name: "地理総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_2_地総_問.pdf", aFile: "pdfs/2025_1_2_地総_解.pdf" },
-                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_2_歴総_問.pdf", aFile: "pdfs/2025_1_2_歴総_解.pdf" },
-                { name: "保健", cat: "sub", tag: "保体", qFile: "pdfs/2025_1_2_保健_問.pdf", aFile: "pdfs/2025_1_2_保健_解.pdf" },
-                { name: "家庭科", cat: "sub", tag: "家庭", qFile: "pdfs/2025_1_2_家庭_問.pdf", aFile: "pdfs/2025_1_2_家庭_解.pdf" }
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_2_歴総_問.pdf", aFile: "pdfs/2025_1_2_歴総_解.pdf" }
             ]
         },
         {
@@ -790,7 +784,7 @@
                 { name: "地理総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_4_地総_問.pdf", aFile: "pdfs/2025_1_4_地総_解.pdf" },
                 { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_4_歴総_問.pdf", aFile: "pdfs/2025_1_4_歴総_解.pdf" },
                 { name: "保健", cat: "sub", tag: "保体", qFile: "pdfs/2025_1_4_保健_問.pdf", aFile: "pdfs/2025_1_4_保健_解.pdf" },
-                { name: "家庭科", cat: "sub", tag: "家庭", qFile: "pdfs/2025_1_4_家庭_問.pdf", aFile: "pdfs/2025_1_4_家庭_解.pdf" }
+                { name: "家庭", cat: "sub", tag: "家庭", qFile: "pdfs/2025_1_4_家庭_問.pdf", aFile: "pdfs/2025_1_4_家庭_解.pdf" }
             ]
         }
     ];
@@ -819,7 +813,6 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
-    // 履歴管理
     function addRecent(title, file, type) {
         state.recent = state.recent.filter(r => r.file !== file);
         state.recent.unshift({ title, file, type });
@@ -849,7 +842,6 @@
     let selectedCat = "all";
     let searchKeyword = "";
 
-    // リスト描画
     function renderArchive() {
         const root = document.getElementById("archiveRoot");
         root.innerHTML = "";
