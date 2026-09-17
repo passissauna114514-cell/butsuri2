@@ -3,295 +3,1037 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>定期テスト 過去問ライブラリ</title>
+    <title>定期考査 過去問題録</title>
+    <!-- 明朝体 & 等幅フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Shippori+Mincho:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-light: #eff6ff;
-            --bg-color: #f1f5f9;
-            --card-bg: #ffffff;
-            --border-color: #e2e8f0;
-            --text-main: #0f172a;
-            --text-sub: #64748b;
+            --font-mincho: 'Shippori Mincho', 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-ui: 'Zen Kaku Gothic New', -apple-system, sans-serif;
+
+            --bg: #f7f6f2;
+            --surface: #ffffff;
+            --surface-sub: #f0eee6;
+            --border: #dcd8cd;
+            --border-dark: #8c857b;
+            --text-main: #23221e;
+            --text-sub: #68645d;
+            --accent: #1e3a8a; /* 藍色 */
+            --ans-color: #065f46; /* 深緑 */
+            --split-color: #4b5563;
+            --highlight: #f2f4f8;
+        }
+
+        [data-theme="dark"] {
+            --bg: #141517;
+            --surface: #1d1f23;
+            --surface-sub: #262930;
+            --border: #383d47;
+            --border-dark: #636b7b;
+            --text-main: #eae8e1;
+            --text-sub: #9ca3af;
+            --accent: #60a5fa;
+            --ans-color: #34d399;
+            --split-color: #9ca3af;
+            --highlight: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg);
             color: var(--text-main);
-            margin: 0;
-            padding: 16px;
+            font-family: var(--font-mincho);
+            line-height: 1.6;
+            padding: 28px 16px 80px 16px;
             display: flex;
             justify-content: center;
+            transition: background-color 0.25s, color 0.25s;
         }
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 960px;
         }
 
+        /* ── Header ── */
         header {
-            text-align: center;
-            margin-bottom: 24px;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-bottom: 2px solid var(--text-main);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
         }
 
-        header h1 {
-            margin: 0 0 8px 0;
-            font-size: 1.5rem;
-            color: var(--primary);
-        }
-
-        header p {
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
             color: var(--text-sub);
-            margin: 0;
-            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
         }
 
-        /* フォルダカード */
-        .folder {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            margin-bottom: 14px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            transition: all 0.2s ease;
+        .header-title-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        .folder[open] {
-            border-color: #93c5fd;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08);
+        h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
         }
 
-        /* タップする見出しバー */
-        summary {
-            padding: 16px 20px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.05rem;
+        .header-tools {
             display: flex;
             align-items: center;
+            gap: 12px;
+        }
+
+        .countdown-chip {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            background: var(--surface);
+            border: 1px solid var(--border-dark);
+            padding: 4px 10px;
+            cursor: pointer;
+            display: inline-flex;
+            gap: 6px;
+            align-items: baseline;
+        }
+
+        .countdown-chip strong {
+            color: var(--accent);
+            font-size: 0.95rem;
+        }
+
+        .btn-theme {
+            background: var(--surface);
+            border: 1px solid var(--border-dark);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-theme:hover {
+            background: var(--text-main);
+            color: var(--surface);
+        }
+
+        /* ── 最近閲覧した履歴 ── */
+        .recent-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .recent-label {
+            font-weight: 600;
+            color: var(--text-sub);
+            flex-shrink: 0;
+            font-size: 0.75rem;
+        }
+
+        .recent-items {
+            display: flex;
+            gap: 6px;
+        }
+
+        .recent-chip {
+            background: var(--surface-sub);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 2px 8px;
+            text-decoration: none;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: border-color 0.15s;
+        }
+
+        .recent-chip:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ── Controls (Search / Filters) ── */
+        .filter-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .filter-main-row {
+            display: grid;
+            grid-template-columns: 140px 140px 1fr;
+            gap: 8px;
+        }
+
+        @media (max-width: 640px) {
+            .filter-main-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .search-input-wrap {
+                grid-column: span 2;
+            }
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-dark);
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-mincho);
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .filter-select:focus {
+            border-color: var(--accent);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-dark);
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-mincho);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+
+        .filter-sub-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            width: 50px;
+            flex-shrink: 0;
+        }
+
+        .filter-chip {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            font-family: var(--font-mincho);
+            font-size: 0.78rem;
+            padding: 3px 9px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+
+        .filter-chip.active {
+            background: var(--text-main);
+            border-color: var(--text-main);
+            color: var(--bg);
+            font-weight: 600;
+        }
+
+        .panel-footer {
+            display: flex;
             justify-content: space-between;
-            user-select: none;
-            background-color: var(--card-bg);
+            align-items: center;
+            font-size: 0.78rem;
+            color: var(--text-sub);
+            border-top: 1px dashed var(--border);
+            padding-top: 10px;
+            margin-top: 4px;
+        }
+
+        .action-link {
+            color: var(--accent);
+            text-decoration: none;
+            cursor: pointer;
+            margin-left: 8px;
+            border-bottom: 1px dotted var(--accent);
+        }
+
+        /* ── Exam Accordion Section ── */
+        .exam-section {
+            border: 1px solid var(--border);
+            background: var(--surface);
+            margin-bottom: 16px;
+        }
+
+        .exam-section[open] summary {
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-sub);
+        }
+
+        summary {
+            padding: 14px 18px;
+            cursor: pointer;
             list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            font-weight: 600;
+            transition: background 0.15s;
         }
 
         summary::-webkit-details-marker {
             display: none;
         }
 
-        summary:hover {
-            background-color: var(--primary-light);
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05rem;
+            letter-spacing: 0.04em;
         }
 
-        .folder-title {
+        .section-count {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: normal;
+        }
+
+        .toggle-icon {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+
+        /* 科目リスト行 */
+        .file-table {
+            width: 100%;
+        }
+
+        .file-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            gap: 12px;
+            transition: background-color 0.15s;
+        }
+
+        .file-row:last-child {
+            border-bottom: none;
+        }
+
+        .file-row:hover {
+            background-color: var(--highlight);
+        }
+
+        .row-left {
             display: flex;
             align-items: center;
             gap: 10px;
+            overflow: hidden;
         }
 
-        .folder-icon::before {
-            content: "📁";
-            font-size: 1.3rem;
-        }
-        .folder[open] .folder-icon::before {
-            content: "📂";
-        }
-
-        .badge {
-            font-size: 0.75rem;
-            font-weight: normal;
-            background: #e2e8f0;
-            color: var(--text-sub);
-            padding: 3px 8px;
-            border-radius: 20px;
-        }
-
-        .arrow-icon {
-            font-size: 0.8rem;
-            color: var(--text-sub);
-            transition: transform 0.2s;
-        }
-        .folder[open] .arrow-icon {
-            transform: rotate(180deg);
-        }
-
-        /* 科目一覧リスト */
-        .file-list {
-            padding: 4px 16px 12px 16px;
-            background-color: #fafcff;
-            border-top: 1px solid var(--border-color);
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-        }
-
-        /* PC画面では2列表示にして見やすく */
-        @media (min-width: 600px) {
-            .file-list {
-                grid-template-columns: 1fr 1fr;
-                padding: 12px 20px;
-            }
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 12px;
-            background: white;
-            border: 1px solid #edf2f7;
-            border-radius: 8px;
-        }
-
-        .subject-name {
-            font-size: 0.95rem;
-            font-weight: 500;
+        .row-right {
             display: flex;
             align-items: center;
             gap: 6px;
+            flex-shrink: 0;
         }
 
-        /* 副教科（保健・家庭科）のバッジ */
-        .sub-tag {
-            font-size: 0.65rem;
-            background-color: #fef08a;
-            color: #854d0e;
-            padding: 1px 5px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .open-btn {
-            background-color: var(--primary);
-            color: white;
-            text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: bold;
+        .subj-tag {
+            font-family: var(--font-ui);
+            font-size: 0.68rem;
+            color: var(--text-sub);
+            border: 1px solid var(--border);
+            padding: 1px 6px;
+            border-radius: 2px;
             white-space: nowrap;
-            transition: opacity 0.2s;
+            flex-shrink: 0;
         }
 
-        .open-btn:hover {
-            opacity: 0.85;
+        .subj-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* PDF閲覧リンクボタン */
+        .view-btn {
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 9px;
+            border: 1px solid var(--border-dark);
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-question {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        .btn-question:hover {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .btn-answer {
+            color: var(--ans-color);
+            border-color: var(--ans-color);
+        }
+        .btn-answer:hover {
+            background: var(--ans-color);
+            color: #ffffff;
+        }
+
+        .btn-split {
+            color: var(--split-color);
+            border-color: var(--border-dark);
+            background: var(--surface-sub);
+        }
+        .btn-split:hover {
+            background: var(--text-main);
+            color: var(--surface);
+        }
+
+        /* ── 2画面分割プレビューモーダル ── */
+        .viewer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            padding: 12px;
+        }
+
+        .viewer-modal.open {
+            display: flex;
+        }
+
+        .viewer-header {
+            background: var(--surface);
+            border: 1px solid var(--border-dark);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+
+        .viewer-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.04em;
+        }
+
+        .viewer-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .viewer-body {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            min-height: 0;
+        }
+
+        @media (max-width: 768px) {
+            .viewer-body {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+        }
+
+        .pane-wrap {
+            background: #fff;
+            border: 1px solid var(--border-dark);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .pane-header {
+            background: var(--surface-sub);
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .pane-wrap iframe {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* ── 日付設定モーダル ── */
+        .dialog-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            place-items: center;
+            z-index: 100;
+        }
+
+        .dialog-backdrop.open {
+            display: grid;
+        }
+
+        .dialog-box {
+            background: var(--surface);
+            border: 1px solid var(--text-main);
+            padding: 24px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .dialog-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+        }
+
+        .dialog-box input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-dark);
+            font-family: var(--font-mono);
+            margin-bottom: 16px;
+            background: var(--bg);
+            color: var(--text-main);
+        }
+
+        .no-records {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            border: 1px dashed var(--border);
+            display: none;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- ヘッダー -->
     <header>
-        <h1>📝 定期テスト 過去問サイト</h1>
-        <p>テスト期間をタップして科目のPDFを開いてください</p>
+        <div class="header-meta">
+            <span>PERIODICAL EXAMINATION ARCHIVE</span>
+            <span id="currentDateDisplay">----.--.--</span>
+        </div>
+        <div class="header-title-wrap">
+            <h1>定期考査 過去問題録</h1>
+            <div class="header-tools">
+                <div class="countdown-chip" id="setDateBtn" title="クリックして試験日を設定">
+                    <span>次回考査まで</span>
+                    <strong id="daysRemain">--</strong>
+                    <span>日</span>
+                </div>
+                <button class="btn-theme" id="themeBtn">反転 (白/黒)</button>
+            </div>
+        </div>
     </header>
 
-    <!-- 1. 前期中間 (10科目) -->
-    <details class="folder" open>
-        <summary>
-            <div class="folder-title">
-                <span class="folder-icon"></span>
-                <span>前期中間テスト</span>
-                <span class="badge">全10科目</span>
-            </div>
-            <span class="arrow-icon">▼</span>
-        </summary>
-        <div class="file-list">
-            <div class="file-item"><span class="subject-name">📄 数学Ⅰ</span><a href="pdfs/1_zenki_chukan/数学1.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 数学A</span><a href="pdfs/1_zenki_chukan/数学A.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 現代の国語</span><a href="pdfs/1_zenki_chukan/現代の国語.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 言語文化</span><a href="pdfs/1_zenki_chukan/言語文化.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 英語EC</span><a href="pdfs/1_zenki_chukan/EC.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 英語LE</span><a href="pdfs/1_zenki_chukan/LE.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 物理</span><a href="pdfs/1_zenki_chukan/物理.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 生物</span><a href="pdfs/1_zenki_chukan/生物.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 地理</span><a href="pdfs/1_zenki_chukan/地理.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 歴史</span><a href="pdfs/1_zenki_chukan/歴史.pdf" target="_blank" class="open-btn">開く</a></div>
-        </div>
-    </details>
+    <!-- 最近閲覧した問題 (履歴バー) -->
+    <div class="recent-bar" id="recentBar" style="display: none;">
+        <span class="recent-label">最近の閲覧:</span>
+        <div class="recent-items" id="recentItems"></div>
+    </div>
 
-    <!-- 2. 前期期末 (12科目) -->
-    <details class="folder">
-        <summary>
-            <div class="folder-title">
-                <span class="folder-icon"></span>
-                <span>前期期末テスト</span>
-                <span class="badge">全12科目</span>
+    <!-- 検索・抽出パネル -->
+    <div class="filter-panel">
+        <div class="filter-main-row">
+            <!-- 年度選択 -->
+            <div>
+                <select id="yearSelect" class="filter-select">
+                    <option value="all">すべての年度</option>
+                    <option value="2025" selected>2025年度</option>
+                </select>
             </div>
-            <span class="arrow-icon">▼</span>
-        </summary>
-        <div class="file-list">
-            <div class="file-item"><span class="subject-name">📄 数学Ⅰ</span><a href="pdfs/2_zenki_kimatsu/数学1.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 数学A</span><a href="pdfs/2_zenki_kimatsu/数学A.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 現代の国語</span><a href="pdfs/2_zenki_kimatsu/現代の国語.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 言語文化</span><a href="pdfs/2_zenki_kimatsu/言語文化.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 英語EC</span><a href="pdfs/2_zenki_kimatsu/EC.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 英語LE</span><a href="pdfs/2_zenki_kimatsu/LE.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 物理</span><a href="pdfs/2_zenki_kimatsu/物理.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 生物</span><a href="pdfs/2_zenki_kimatsu/生物.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 地理</span><a href="pdfs/2_zenki_kimatsu/地理.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 歴史</span><a href="pdfs/2_zenki_kimatsu/歴史.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 保健 <span class="sub-tag">期末</span></span><a href="pdfs/2_zenki_kimatsu/保健.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 家庭科 <span class="sub-tag">期末</span></span><a href="pdfs/2_zenki_kimatsu/家庭科.pdf" target="_blank" class="open-btn">開く</a></div>
+            <!-- 学年選択 -->
+            <div>
+                <select id="gradeSelect" class="filter-select">
+                    <option value="all">すべての学年</option>
+                    <option value="1" selected>第1学年</option>
+                    <option value="2">第2学年</option>
+                    <option value="3">第3学年</option>
+                </select>
+            </div>
+            <!-- 科目検索 -->
+            <div class="search-input-wrap">
+                <input type="text" id="searchInput" class="search-input" placeholder="科目名称で検索 (例: 数学Ⅰ, 物理基礎, 地理総合...)">
+            </div>
         </div>
-    </details>
 
-    <!-- 3. 後期中間 (10科目) -->
-    <details class="folder">
-        <summary>
-            <div class="folder-title">
-                <span class="folder-icon"></span>
-                <span>後期中間テスト</span>
-                <span class="badge">全10科目</span>
+        <div class="filter-sub-row">
+            <!-- 考査区分タブ -->
+            <div class="filter-group">
+                <span class="filter-group-label">考査:</span>
+                <button class="filter-chip active" data-term="all">全考査</button>
+                <button class="filter-chip" data-term="前期中間">前期中間</button>
+                <button class="filter-chip" data-term="前期末">前期末</button>
+                <button class="filter-chip" data-term="後期中間">後期中間</button>
+                <button class="filter-chip" data-term="後期末">後期末</button>
             </div>
-            <span class="arrow-icon">▼</span>
-        </summary>
-        <div class="file-list">
-            <div class="file-item"><span class="subject-name">📄 数学Ⅰ</span><a href="pdfs/3_kouki_chukan/数学1.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 数学A</span><a href="pdfs/3_kouki_chukan/数学A.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 現代の国語</span><a href="pdfs/3_kouki_chukan/現代の国語.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 言語文化</span><a href="pdfs/3_kouki_chukan/言語文化.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 英語EC</span><a href="pdfs/3_kouki_chukan/EC.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 英語LE</span><a href="pdfs/3_kouki_chukan/LE.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 物理</span><a href="pdfs/3_kouki_chukan/物理.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 生物</span><a href="pdfs/3_kouki_chukan/生物.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 地理</span><a href="pdfs/3_kouki_chukan/地理.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 歴史</span><a href="pdfs/3_kouki_chukan/歴史.pdf" target="_blank" class="open-btn">開く</a></div>
+            <!-- 教科タグ -->
+            <div class="filter-group" id="categoryTabs">
+                <span class="filter-group-label">教科:</span>
+                <button class="filter-chip active" data-cat="all">全教科</button>
+                <button class="filter-chip" data-cat="math">数学</button>
+                <button class="filter-chip" data-cat="japanese">国語</button>
+                <button class="filter-chip" data-cat="english">外国語</button>
+                <button class="filter-chip" data-cat="science">理科</button>
+                <button class="filter-chip" data-cat="social">地歴</button>
+                <button class="filter-chip" data-cat="sub">実技・家庭</button>
+            </div>
         </div>
-    </details>
 
-    <!-- 4. 後期期末 (12科目) -->
-    <details class="folder">
-        <summary>
-            <div class="folder-title">
-                <span class="folder-icon"></span>
-                <span>後期期末テスト</span>
-                <span class="badge">全12科目</span>
+        <div class="panel-footer">
+            <span id="filteredCount">全 44 項目</span>
+            <div>
+                <span class="action-link" id="expandAll">すべて展開</span>
+                <span class="action-link" id="collapseAll">すべて閉じる</span>
             </div>
-            <span class="arrow-icon">▼</span>
-        </summary>
-        <div class="file-list">
-            <div class="file-item"><span class="subject-name">📄 数学Ⅰ</span><a href="pdfs/4_kouki_kimatsu/数学1.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 数学A</span><a href="pdfs/4_kouki_kimatsu/数学A.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 現代の国語</span><a href="pdfs/4_kouki_kimatsu/現代の国語.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 言語文化</span><a href="pdfs/4_kouki_kimatsu/言語文化.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 英語EC</span><a href="pdfs/4_kouki_kimatsu/EC.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 英語LE</span><a href="pdfs/4_kouki_kimatsu/LE.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 物理</span><a href="pdfs/4_kouki_kimatsu/物理.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 生物</span><a href="pdfs/4_kouki_kimatsu/生物.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 地理</span><a href="pdfs/4_kouki_kimatsu/地理.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 歴史</span><a href="pdfs/4_kouki_kimatsu/歴史.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 保健 <span class="sub-tag">期末</span></span><a href="pdfs/4_kouki_kimatsu/保健.pdf" target="_blank" class="open-btn">開く</a></div>
-            <div class="file-item"><span class="subject-name">📄 家庭科 <span class="sub-tag">期末</span></span><a href="pdfs/4_kouki_kimatsu/家庭科.pdf" target="_blank" class="open-btn">開く</a></div>
         </div>
-    </details>
+    </div>
+
+    <!-- 過去問リスト構造 -->
+    <div id="archiveRoot"></div>
+    <div class="no-records" id="noRecords">該当する過去問記録が存在しません。</div>
 </div>
+
+<!-- 2画面分割プレビューモーダル -->
+<div class="viewer-modal" id="viewerModal">
+    <div class="viewer-header">
+        <div class="viewer-title" id="viewerSubjectTitle">過去問プレビュー</div>
+        <div class="viewer-actions">
+            <button class="btn-theme" id="closeViewerBtn">✕ 閉じる (Esc)</button>
+        </div>
+    </div>
+    <div class="viewer-body">
+        <div class="pane-wrap">
+            <div class="pane-header">
+                <span>[問題]</span>
+                <a id="extQuestionLink" href="#" target="_blank" class="action-link">別タブ ↗</a>
+            </div>
+            <iframe id="frameQuestion" src=""></iframe>
+        </div>
+        <div class="pane-wrap">
+            <div class="pane-header">
+                <span>[模範解答]</span>
+                <a id="extAnswerLink" href="#" target="_blank" class="action-link">別タブ ↗</a>
+            </div>
+            <iframe id="frameAnswer" src=""></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- 日付設定ダイアログ -->
+<div class="dialog-backdrop" id="dateDialog">
+    <div class="dialog-box">
+        <h3>次回考査 期日設定</h3>
+        <input type="date" id="dateField">
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button class="btn-theme" id="cancelDateBtn">取消</button>
+            <button class="btn-theme" id="saveDateBtn" style="border-color: var(--accent); color: var(--accent);">設定</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 過去問データ (最短・最速命名ルール適用版)
+    // ファイルはすべて pdfs/ フォルダに直接保存します
+    const archiveData = [
+        {
+            id: "2025_g1_term1_mid",
+            year: "2025",
+            grade: "1",
+            term: "前期中間",
+            name: "2025年度 第1学年 前期中間考査",
+            items: [
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "pdfs/2025_1_1_数1_問.pdf", aFile: "pdfs/2025_1_1_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "pdfs/2025_1_1_数A_問.pdf", aFile: "pdfs/2025_1_1_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_1_現国_問.pdf", aFile: "pdfs/2025_1_1_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_1_言文_問.pdf", aFile: "pdfs/2025_1_1_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_1_EC_問.pdf", aFile: "pdfs/2025_1_1_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_1_LE_問.pdf", aFile: "pdfs/2025_1_1_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_1_物基_問.pdf", aFile: "pdfs/2025_1_1_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_1_生基_問.pdf", aFile: "pdfs/2025_1_1_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_1_地総_問.pdf", aFile: "pdfs/2025_1_1_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_1_歴総_問.pdf", aFile: "pdfs/2025_1_1_歴総_解.pdf" }
+            ]
+        },
+        {
+            id: "2025_g1_term1_fin",
+            year: "2025",
+            grade: "1",
+            term: "前期末",
+            name: "2025年度 第1学年 前期末考査",
+            items: [
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "pdfs/2025_1_2_数1_問.pdf", aFile: "pdfs/2025_1_2_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "pdfs/2025_1_2_数A_問.pdf", aFile: "pdfs/2025_1_2_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_2_現国_問.pdf", aFile: "pdfs/2025_1_2_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_2_言文_問.pdf", aFile: "pdfs/2025_1_2_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_2_EC_問.pdf", aFile: "pdfs/2025_1_2_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_2_LE_問.pdf", aFile: "pdfs/2025_1_2_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_2_物基_問.pdf", aFile: "pdfs/2025_1_2_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_2_生基_問.pdf", aFile: "pdfs/2025_1_2_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_2_地総_問.pdf", aFile: "pdfs/2025_1_2_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_2_歴総_問.pdf", aFile: "pdfs/2025_1_2_歴総_解.pdf" },
+                { name: "保健", cat: "sub", tag: "保体", qFile: "pdfs/2025_1_2_保健_問.pdf", aFile: "pdfs/2025_1_2_保健_解.pdf" },
+                { name: "家庭科", cat: "sub", tag: "家庭", qFile: "pdfs/2025_1_2_家庭_問.pdf", aFile: "pdfs/2025_1_2_家庭_解.pdf" }
+            ]
+        },
+        {
+            id: "2025_g1_term2_mid",
+            year: "2025",
+            grade: "1",
+            term: "後期中間",
+            name: "2025年度 第1学年 後期中間考査",
+            items: [
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "pdfs/2025_1_3_数1_問.pdf", aFile: "pdfs/2025_1_3_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "pdfs/2025_1_3_数A_問.pdf", aFile: "pdfs/2025_1_3_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_3_現国_問.pdf", aFile: "pdfs/2025_1_3_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_3_言文_問.pdf", aFile: "pdfs/2025_1_3_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_3_EC_問.pdf", aFile: "pdfs/2025_1_3_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_3_LE_問.pdf", aFile: "pdfs/2025_1_3_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_3_物基_問.pdf", aFile: "pdfs/2025_1_3_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_3_生基_問.pdf", aFile: "pdfs/2025_1_3_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_3_地総_問.pdf", aFile: "pdfs/2025_1_3_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_3_歴総_問.pdf", aFile: "pdfs/2025_1_3_歴総_解.pdf" }
+            ]
+        },
+        {
+            id: "2025_g1_term2_fin",
+            year: "2025",
+            grade: "1",
+            term: "後期末",
+            name: "2025年度 第1学年 後期末考査",
+            items: [
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "pdfs/2025_1_4_数1_問.pdf", aFile: "pdfs/2025_1_4_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "pdfs/2025_1_4_数A_問.pdf", aFile: "pdfs/2025_1_4_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_4_現国_問.pdf", aFile: "pdfs/2025_1_4_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_4_言文_問.pdf", aFile: "pdfs/2025_1_4_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_4_EC_問.pdf", aFile: "pdfs/2025_1_4_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_4_LE_問.pdf", aFile: "pdfs/2025_1_4_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_4_物基_問.pdf", aFile: "pdfs/2025_1_4_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_4_生基_問.pdf", aFile: "pdfs/2025_1_4_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_4_地総_問.pdf", aFile: "pdfs/2025_1_4_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_4_歴総_問.pdf", aFile: "pdfs/2025_1_4_歴総_解.pdf" },
+                { name: "保健", cat: "sub", tag: "保体", qFile: "pdfs/2025_1_4_保健_問.pdf", aFile: "pdfs/2025_1_4_保健_解.pdf" },
+                { name: "家庭科", cat: "sub", tag: "家庭", qFile: "pdfs/2025_1_4_家庭_問.pdf", aFile: "pdfs/2025_1_4_家庭_解.pdf" }
+            ]
+        }
+    ];
+
+    // ブラウザ自動保存
+    const STORAGE_KEY = "exam_portal_store";
+    let state = {
+        targetDate: "",
+        theme: "light",
+        recent: []
+    };
+
+    function loadState() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+            try { state = Object.assign(state, JSON.parse(raw)); } catch(e){}
+        }
+        if (state.theme === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+        }
+        renderRecent();
+        updateCountdown();
+    }
+
+    function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    // 履歴管理
+    function addRecent(title, file, type) {
+        state.recent = state.recent.filter(r => r.file !== file);
+        state.recent.unshift({ title, file, type });
+        if (state.recent.length > 3) state.recent.pop();
+        saveState();
+        renderRecent();
+    }
+
+    function renderRecent() {
+        const bar = document.getElementById("recentBar");
+        const list = document.getElementById("recentItems");
+        if (!state.recent || state.recent.length === 0) {
+            bar.style.display = "none";
+            return;
+        }
+        bar.style.display = "flex";
+        list.innerHTML = state.recent.map(r => `
+            <a href="${r.file}" target="_blank" class="recent-chip">
+                <span>[${r.type}]</span> ${r.title} ↗
+            </a>
+        `).join("");
+    }
+
+    let selectedYear = "2025";
+    let selectedGrade = "1";
+    let selectedTerm = "all";
+    let selectedCat = "all";
+    let searchKeyword = "";
+
+    // リスト描画
+    function renderArchive() {
+        const root = document.getElementById("archiveRoot");
+        root.innerHTML = "";
+
+        let matchCount = 0;
+
+        archiveData.forEach((section, idx) => {
+            if (selectedYear !== "all" && section.year !== selectedYear) return;
+            if (selectedGrade !== "all" && section.grade !== selectedGrade) return;
+            if (selectedTerm !== "all" && section.term !== selectedTerm) return;
+
+            const matchedItems = section.items.filter(item => {
+                const matchQuery = item.name.includes(searchKeyword);
+                const matchCat = (selectedCat === "all") || (item.cat === selectedCat);
+                return matchQuery && matchCat;
+            });
+
+            if (matchedItems.length === 0) return;
+            matchCount += matchedItems.length;
+
+            const details = document.createElement("details");
+            details.className = "exam-section";
+            if (idx === 0 || selectedTerm !== "all") details.open = true;
+
+            const summary = document.createElement("summary");
+            summary.innerHTML = `
+                <div class="section-title">
+                    <span>${section.name}</span>
+                    <span class="section-count">[ ${matchedItems.length} 項目 ]</span>
+                </div>
+                <span class="toggle-icon">開閉 ＋/－</span>
+            `;
+            details.appendChild(summary);
+
+            const table = document.createElement("div");
+            table.className = "file-table";
+
+            matchedItems.forEach(item => {
+                const row = document.createElement("div");
+                row.className = "file-row";
+                row.innerHTML = `
+                    <div class="row-left">
+                        <span class="subj-tag">${item.tag}</span>
+                        <span class="subj-title">${item.name}</span>
+                    </div>
+                    <div class="row-right">
+                        <button class="view-btn btn-split" data-name="${section.name}・${item.name}" data-q="${item.qFile}" data-a="${item.aFile}">並べて表示</button>
+                        <a href="${item.qFile}" target="_blank" class="view-btn btn-question" data-title="${section.name} ${item.name}" data-type="問題">問題</a>
+                        <a href="${item.aFile}" target="_blank" class="view-btn btn-answer" data-title="${section.name} ${item.name}" data-type="解答">解答</a>
+                    </div>
+                `;
+                table.appendChild(row);
+            });
+
+            details.appendChild(table);
+            root.appendChild(details);
+        });
+
+        document.getElementById("filteredCount").textContent = `表示中: ${matchCount} 項目`;
+        document.getElementById("noRecords").style.display = matchCount === 0 ? "block" : "none";
+
+        bindRowEvents();
+    }
+
+    function bindRowEvents() {
+        document.querySelectorAll(".btn-question, .btn-answer").forEach(link => {
+            link.addEventListener("click", (e) => {
+                const title = e.currentTarget.dataset.title;
+                const type = e.currentTarget.dataset.type;
+                const file = e.currentTarget.getAttribute("href");
+                addRecent(title, file, type);
+            });
+        });
+
+        document.querySelectorAll(".btn-split").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const name = e.currentTarget.dataset.name;
+                const q = e.currentTarget.dataset.q;
+                const a = e.currentTarget.dataset.a;
+
+                document.getElementById("viewerSubjectTitle").textContent = name;
+                document.getElementById("frameQuestion").src = q;
+                document.getElementById("frameAnswer").src = a;
+                document.getElementById("extQuestionLink").href = q;
+                document.getElementById("extAnswerLink").href = a;
+
+                document.getElementById("viewerModal").classList.add("open");
+                addRecent(name, q, "2画面");
+            });
+        });
+    }
+
+    function closeViewer() {
+        document.getElementById("viewerModal").classList.remove("open");
+        document.getElementById("frameQuestion").src = "";
+        document.getElementById("frameAnswer").src = "";
+    }
+
+    document.getElementById("closeViewerBtn").addEventListener("click", closeViewer);
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeViewer();
+    });
+
+    function updateCountdown() {
+        if (!state.targetDate) {
+            document.getElementById("daysRemain").textContent = "--";
+            return;
+        }
+        const target = new Date(state.targetDate + "T00:00:00");
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+        document.getElementById("daysRemain").textContent = diff >= 0 ? diff : "終了";
+    }
+
+    document.getElementById("yearSelect").addEventListener("change", (e) => {
+        selectedYear = e.target.value;
+        renderArchive();
+    });
+    document.getElementById("gradeSelect").addEventListener("change", (e) => {
+        selectedGrade = e.target.value;
+        renderArchive();
+    });
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+        searchKeyword = e.target.value.trim();
+        renderArchive();
+    });
+
+    document.querySelectorAll("[data-term]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll("[data-term]").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedTerm = btn.dataset.term;
+            renderArchive();
+        });
+    });
+
+    document.querySelectorAll("[data-cat]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll("[data-cat]").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedCat = btn.dataset.cat;
+            renderArchive();
+        });
+    });
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+        document.querySelectorAll(".exam-section").forEach(s => s.open = true);
+    });
+    document.getElementById("collapseAll").addEventListener("click", () => {
+        document.querySelectorAll(".exam-section").forEach(s => s.open = false);
+    });
+
+    document.getElementById("themeBtn").addEventListener("click", () => {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        const next = isDark ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        state.theme = next;
+        saveState();
+    });
+
+    const dialog = document.getElementById("dateDialog");
+    const dateField = document.getElementById("dateField");
+    document.getElementById("setDateBtn").addEventListener("click", () => {
+        dateField.value = state.targetDate || "";
+        dialog.classList.add("open");
+    });
+    document.getElementById("cancelDateBtn").addEventListener("click", () => {
+        dialog.classList.remove("open");
+    });
+    document.getElementById("saveDateBtn").addEventListener("click", () => {
+        state.targetDate = dateField.value;
+        saveState();
+        updateCountdown();
+        dialog.classList.remove("open");
+    });
+
+    const now = new Date();
+    document.getElementById("currentDateDisplay").textContent = 
+        `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+
+    loadState();
+    renderArchive();
+</script>
 
 </body>
 </html>
