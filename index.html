@@ -146,7 +146,7 @@
         .container {
             width: 100%;
             max-width: 960px;
-            display: none; /* 認証後に表示 */
+            display: none;
         }
 
         /* ── Header ── */
@@ -804,14 +804,12 @@
        ═══════════════════════════════════════════════════════ */
     const TARGET_PASSWORD_HASH = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f";
 
-    // SHA-256 計算ユーティリティ
     async function sha256(str) {
         const buffer = new TextEncoder().encode(str);
         const digest = await crypto.subtle.digest("SHA-256", buffer);
         return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
     }
 
-    // パスワード変更用ヘルパー（F12コンソールで makeHash('新しいパスワード') を実行）
     window.makeHash = async function(newPassword) {
         const hash = await sha256(newPassword);
         console.log(`%c[新パスワードのハッシュ値]`, "color: #1e3a8a; font-weight: bold; font-size: 14px;");
@@ -820,7 +818,6 @@
         return hash;
     };
 
-    // 認証処理
     async function attemptLogin() {
         const input = document.getElementById("passwordInput").value;
         const err = document.getElementById("authError");
@@ -845,14 +842,13 @@
         attemptLogin();
     });
 
-    // 施錠（ログアウト）
     document.getElementById("lockBtn").addEventListener("click", () => {
         localStorage.removeItem("exam_portal_auth_token");
         location.reload();
     });
 
     /* ═══════════════════════════════════════════════════════
-       過去問データ
+       過去問データ（同階層のPDFを直接参照）
        ═══════════════════════════════════════════════════════ */
     const archiveData = [
         {
@@ -862,18 +858,18 @@
             term: "前期期末",
             name: "2025年度 第1学年 前期期末考査",
             items: [
-                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "pdfs/2025_1_1_数1_問.pdf", aFile: "pdfs/2025_1_1_数1_解.pdf" },
-                { name: "数学A", cat: "math", tag: "数学", qFile: "pdfs/2025_1_1_数A_問.pdf", aFile: "pdfs/2025_1_1_数A_解.pdf" },
-                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_1_現国_問.pdf", aFile: "pdfs/2025_1_1_現国_解.pdf" },
-                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_1_言文_問.pdf", aFile: "pdfs/2025_1_1_言文_解.pdf" },
-                { name: "英語EC", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_1_EC_問.pdf", aFile: "pdfs/2025_1_1_EC_解.pdf" },
-                { name: "英語LE", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_1_LE_問.pdf", aFile: "pdfs/2025_1_1_LE_解.pdf" },
-                { name: "物理基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_1_物基_問.pdf", aFile: "pdfs/2025_1_1_物基_解.pdf" },
-                { name: "生物基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_1_生基_問.pdf", aFile: "pdfs/2025_1_1_生基_解.pdf" },
-                { name: "地理総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_1_地総_問.pdf", aFile: "pdfs/2025_1_1_地総_解.pdf" },
-                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_1_歴総_問.pdf", aFile: "pdfs/2025_1_1_歴総_解.pdf" },
-                { name: "保健", cat: "sub", tag: "保体", qFile: "pdfs/2025_1_1_保健_問.pdf", aFile: "pdfs/2025_1_1_保健_解.pdf" },
-                { name: "家庭", cat: "sub", tag: "家庭", qFile: "pdfs/2025_1_1_家庭_問.pdf", aFile: "pdfs/2025_1_1_家庭_解.pdf" }
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_1_数1_問.pdf", aFile: "2025_1_1_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_1_数A_問.pdf", aFile: "2025_1_1_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_1_現国_問.pdf", aFile: "2025_1_1_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_1_言文_問.pdf", aFile: "2025_1_1_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_1_EC_問.pdf", aFile: "2025_1_1_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_1_LE_問.pdf", aFile: "2025_1_1_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_1_物基_問.pdf", aFile: "2025_1_1_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_1_生基_問.pdf", aFile: "2025_1_1_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_1_地総_問.pdf", aFile: "2025_1_1_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_1_歴総_問.pdf", aFile: "2025_1_1_歴総_解.pdf" },
+                { name: "保健", cat: "sub", tag: "保体", qFile: "2025_1_1_保健_問.pdf", aFile: "2025_1_1_保健_解.pdf" },
+                { name: "家庭", cat: "sub", tag: "家庭", qFile: "2025_1_1_家庭_問.pdf", aFile: "2025_1_1_家庭_解.pdf" }
             ]
         },
         {
@@ -883,16 +879,16 @@
             term: "前期中間",
             name: "2025年度 第1学年 前期中間考査",
             items: [
-                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "pdfs/2025_1_2_数1_問.pdf", aFile: "pdfs/2025_1_2_数1_解.pdf" },
-                { name: "数学A", cat: "math", tag: "数学", qFile: "pdfs/2025_1_2_数A_問.pdf", aFile: "pdfs/2025_1_2_数A_解.pdf" },
-                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_2_現国_問.pdf", aFile: "pdfs/2025_1_2_現国_解.pdf" },
-                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_2_言文_問.pdf", aFile: "pdfs/2025_1_2_言文_解.pdf" },
-                { name: "英語EC", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_2_EC_問.pdf", aFile: "pdfs/2025_1_2_EC_解.pdf" },
-                { name: "英語LE", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_2_LE_問.pdf", aFile: "pdfs/2025_1_2_LE_解.pdf" },
-                { name: "物理基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_2_物基_問.pdf", aFile: "pdfs/2025_1_2_物基_解.pdf" },
-                { name: "生物基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_2_生基_問.pdf", aFile: "pdfs/2025_1_2_生基_解.pdf" },
-                { name: "地理総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_2_地総_問.pdf", aFile: "pdfs/2025_1_2_地総_解.pdf" },
-                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_2_歴総_問.pdf", aFile: "pdfs/2025_1_2_歴総_解.pdf" }
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_2_数1_問.pdf", aFile: "2025_1_2_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_2_数A_問.pdf", aFile: "2025_1_2_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_2_現国_問.pdf", aFile: "2025_1_2_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_2_言文_問.pdf", aFile: "2025_1_2_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_2_EC_問.pdf", aFile: "2025_1_2_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_2_LE_問.pdf", aFile: "2025_1_2_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_2_物基_問.pdf", aFile: "2025_1_2_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_2_生基_問.pdf", aFile: "2025_1_2_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_2_地総_問.pdf", aFile: "2025_1_2_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_2_歴総_問.pdf", aFile: "2025_1_2_歴総_解.pdf" }
             ]
         },
         {
@@ -902,16 +898,16 @@
             term: "後期中間",
             name: "2025年度 第1学年 後期中間考査",
             items: [
-                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "pdfs/2025_1_3_数1_問.pdf", aFile: "pdfs/2025_1_3_数1_解.pdf" },
-                { name: "数学A", cat: "math", tag: "数学", qFile: "pdfs/2025_1_3_数A_問.pdf", aFile: "pdfs/2025_1_3_数A_解.pdf" },
-                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_3_現国_問.pdf", aFile: "pdfs/2025_1_3_現国_解.pdf" },
-                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_3_言文_問.pdf", aFile: "pdfs/2025_1_3_言文_解.pdf" },
-                { name: "英語EC", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_3_EC_問.pdf", aFile: "pdfs/2025_1_3_EC_解.pdf" },
-                { name: "英語LE", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_3_LE_問.pdf", aFile: "pdfs/2025_1_3_LE_解.pdf" },
-                { name: "物理基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_3_物基_問.pdf", aFile: "pdfs/2025_1_3_物基_解.pdf" },
-                { name: "生物基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_3_生基_問.pdf", aFile: "pdfs/2025_1_3_生基_解.pdf" },
-                { name: "地理総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_3_地総_問.pdf", aFile: "pdfs/2025_1_3_地総_解.pdf" },
-                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_3_歴総_問.pdf", aFile: "pdfs/2025_1_3_歴総_解.pdf" }
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_3_数1_問.pdf", aFile: "2025_1_3_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_3_数A_問.pdf", aFile: "2025_1_3_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_3_現国_問.pdf", aFile: "2025_1_3_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_3_言文_問.pdf", aFile: "2025_1_3_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_3_EC_問.pdf", aFile: "2025_1_3_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_3_LE_問.pdf", aFile: "2025_1_3_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_3_物基_問.pdf", aFile: "2025_1_3_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_3_生基_問.pdf", aFile: "2025_1_3_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_3_地総_問.pdf", aFile: "2025_1_3_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_3_歴総_問.pdf", aFile: "2025_1_3_歴総_解.pdf" }
             ]
         },
         {
@@ -921,18 +917,18 @@
             term: "後期末",
             name: "2025年度 第1学年 後期末考査",
             items: [
-                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "pdfs/2025_1_4_数1_問.pdf", aFile: "pdfs/2025_1_4_数1_解.pdf" },
-                { name: "数学A", cat: "math", tag: "数学", qFile: "pdfs/2025_1_4_数A_問.pdf", aFile: "pdfs/2025_1_4_数A_解.pdf" },
-                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_4_現国_問.pdf", aFile: "pdfs/2025_1_4_現国_解.pdf" },
-                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "pdfs/2025_1_4_言文_問.pdf", aFile: "pdfs/2025_1_4_言文_解.pdf" },
-                { name: "英語EC", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_4_EC_問.pdf", aFile: "pdfs/2025_1_4_EC_解.pdf" },
-                { name: "英語LE", cat: "english", tag: "外国語", qFile: "pdfs/2025_1_4_LE_問.pdf", aFile: "pdfs/2025_1_4_LE_解.pdf" },
-                { name: "物理基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_4_物基_問.pdf", aFile: "pdfs/2025_1_4_物基_解.pdf" },
-                { name: "生物基礎", cat: "science", tag: "理科", qFile: "pdfs/2025_1_4_生基_問.pdf", aFile: "pdfs/2025_1_4_生基_解.pdf" },
-                { name: "地理総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_4_地総_問.pdf", aFile: "pdfs/2025_1_4_地総_解.pdf" },
-                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "pdfs/2025_1_4_歴総_問.pdf", aFile: "pdfs/2025_1_4_歴総_解.pdf" },
-                { name: "保健", cat: "sub", tag: "保体", qFile: "pdfs/2025_1_4_保健_問.pdf", aFile: "pdfs/2025_1_4_保健_解.pdf" },
-                { name: "家庭", cat: "sub", tag: "家庭", qFile: "pdfs/2025_1_4_家庭_問.pdf", aFile: "pdfs/2025_1_4_家庭_解.pdf" }
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_4_数1_問.pdf", aFile: "2025_1_4_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_4_数A_問.pdf", aFile: "2025_1_4_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_4_現国_問.pdf", aFile: "2025_1_4_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_4_言文_問.pdf", aFile: "2025_1_4_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_4_EC_問.pdf", aFile: "2025_1_4_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_4_LE_問.pdf", aFile: "2025_1_4_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_4_物基_問.pdf", aFile: "2025_1_4_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_4_生基_問.pdf", aFile: "2025_1_4_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_4_地総_問.pdf", aFile: "2025_1_4_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_4_歴総_問.pdf", aFile: "2025_1_4_歴総_解.pdf" },
+                { name: "保健", cat: "sub", tag: "保体", qFile: "2025_1_4_保健_問.pdf", aFile: "2025_1_4_保健_解.pdf" },
+                { name: "家庭", cat: "sub", tag: "家庭", qFile: "2025_1_4_家庭_問.pdf", aFile: "2025_1_4_家庭_解.pdf" }
             ]
         }
     ];
@@ -1170,7 +1166,6 @@
     document.getElementById("currentDateDisplay").textContent = 
         `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
 
-    // 起動時：既にログイン済みか検証
     (function checkAuthOnLoad() {
         const token = localStorage.getItem("exam_portal_auth_token");
         if (token === TARGET_PASSWORD_HASH) {
