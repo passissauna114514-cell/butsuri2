@@ -27,6 +27,7 @@
             --role-color: #68645d;
             --card-bg: #fcfbfa;
             --sidebar-bg: #ffffff;
+            --canvas-bg: #f8fafc;
         }
 
         /* ── ② 管理者用：藍夜ダーク ── */
@@ -48,19 +49,20 @@
             --admin-btn: #38bdf8;
             --card-bg: #151f38;
             --sidebar-bg: #11182c;
+            --canvas-bg: #0f172a;
         }
 
         /* ── ③ 物理部用：大正レトロ 深緑×焦茶×金古美 ── */
         body[data-role="physics"] {
             --font-main: 'Zen Old Mincho', 'Klee One', 'Shippori Mincho', serif;
-            --bg: #0b1410;               /* 深緑黒 */
-            --surface: #122019;          /* 深緑 */
+            --bg: #0b1410;
+            --surface: #122019;
             --surface-sub: #1a2c24;
-            --border: #3b2c1a;           /* 焦茶 */
-            --border-dark: #6e5231;      /* 飴色木枠 */
-            --text-main: #ebdcc9;        /* 古紙色 */
-            --text-sub: #a49783;         /* 枯れインク */
-            --accent: #c49a45;           /* 真鍮金古美 */
+            --border: #3b2c1a;
+            --border-dark: #6e5231;
+            --text-main: #ebdcc9;
+            --text-sub: #a49783;
+            --accent: #c49a45;
             --ans-color: #4ade80;
             --split-color: #c49a45;
             --highlight: #1e332a;
@@ -69,6 +71,7 @@
             --admin-btn: #c49a45;
             --card-bg: #172820;
             --sidebar-bg: #122019;
+            --canvas-bg: #16261f;
         }
 
         * {
@@ -762,7 +765,6 @@
             display: grid;
             gap: 8px;
             min-height: 0;
-            transition: margin-right 0.25s ease;
         }
 
         .viewer-modal.single-mode .viewer-body {
@@ -803,6 +805,7 @@
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
+            align-items: center;
             color: var(--text-main);
         }
 
@@ -813,24 +816,9 @@
             border: none;
         }
 
-        /* ── PDF手書き描画オーバーレイ ── */
-        .pdf-draw-canvas {
-            position: absolute;
-            top: 31px; /* pane-headerの下 */
-            left: 0;
-            width: 100%;
-            height: calc(100% - 31px);
-            pointer-events: none; /* OFF時はPDF操作を妨げない */
-            z-index: 10;
-        }
-        .draw-mode-active .pdf-draw-canvas {
-            pointer-events: auto; /* ON時は描画可能 */
-            cursor: crosshair;
-        }
-
         /* ── 演習ツール引き出し（サイドバー） ── */
         .viewer-sidebar {
-            width: 320px;
+            width: 330px;
             background: var(--sidebar-bg);
             border: 1px solid var(--border-dark);
             display: flex;
@@ -868,17 +856,17 @@
         .sidebar-timer {
             background: var(--surface-sub);
             border: 1px solid var(--border);
-            padding: 12px;
+            padding: 10px;
             text-align: center;
         }
 
         .sidebar-timer-time {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: var(--accent);
             letter-spacing: 0.05em;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .sidebar-timer-controls {
@@ -887,20 +875,34 @@
             justify-content: center;
         }
 
-        /* 手書きペンパレット */
+        /* サイドバー内 手書き計算キャンバス */
+        .sketch-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sketch-canvas {
+            width: 100%;
+            height: 180px;
+            background: var(--canvas-bg);
+            border: 1px solid var(--border-dark);
+            touch-action: none;
+            cursor: crosshair;
+        }
+
         .draw-palette {
             display: flex;
             gap: 6px;
             align-items: center;
             background: var(--surface-sub);
-            padding: 6px 10px;
+            padding: 4px 8px;
             border: 1px solid var(--border);
-            flex-wrap: wrap;
         }
 
         .color-dot {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid transparent;
@@ -1075,11 +1077,12 @@
     <div class="viewer-header">
         <div class="viewer-title" id="viewerSubjectTitle">過去問プレビュー</div>
         <div class="viewer-actions">
-            <!-- 手書き描画切替 -->
-            <button class="btn-theme" id="toggleDrawBtn" style="border-color: var(--accent);">✎ 手書き: OFF</button>
+            <!-- 別窓で全ページ開くボタン -->
+            <a id="extOpenQBtn" href="#" target="_blank" class="view-btn" style="color:var(--accent);">[ 別窓:問題 ↗ ]</a>
+            <a id="extOpenABtn" href="#" target="_blank" class="view-btn" style="color:var(--ans-color); display:none;">[ 別窓:解答 ↗ ]</a>
             <!-- 演習ツール引き出しトグル -->
-            <button class="btn-theme" id="toggleSidebarBtn">演習ツール ◨</button>
-            <button class="btn-theme" id="closeViewerBtn">✕ 閉じる (Esc)</button>
+            <button class="btn-theme" id="toggleSidebarBtn">演習ツール [開閉]</button>
+            <button class="btn-theme" id="closeViewerBtn">閉じる [Esc]</button>
         </div>
     </div>
     
@@ -1088,20 +1091,16 @@
             <div class="pane-wrap" id="paneLeft">
                 <div class="pane-header">
                     <span id="paneLeftTitle">[問題]</span>
-                    <span style="font-size:0.7rem; color:var(--text-sub);">※ 閲覧専用</span>
+                    <span style="font-size:0.7rem; color:var(--text-sub);">※ 閲覧保護領域</span>
                 </div>
                 <iframe id="frameQuestion" src=""></iframe>
-                <!-- 問題用描画キャンバス -->
-                <canvas class="pdf-draw-canvas" id="canvasLeft"></canvas>
             </div>
             <div class="pane-wrap" id="paneRight">
                 <div class="pane-header">
                     <span>[模範解答]</span>
-                    <span style="font-size:0.7rem; color:var(--text-sub);">※ 閲覧専用</span>
+                    <span style="font-size:0.7rem; color:var(--text-sub);">※ 閲覧保護領域</span>
                 </div>
                 <iframe id="frameAnswer" src=""></iframe>
-                <!-- 解答用描画キャンバス -->
-                <canvas class="pdf-draw-canvas" id="canvasRight"></canvas>
             </div>
         </div>
 
@@ -1110,7 +1109,7 @@
             <!-- 50分試験タイマー -->
             <div>
                 <div class="sidebar-section-title">
-                    <span>⏱️ 50分 演習タイマー</span>
+                    <span>[ 50分 演習タイマー ]</span>
                 </div>
                 <div class="sidebar-timer">
                     <div class="sidebar-timer-time" id="sidebarTimerDisplay">50:00</div>
@@ -1121,29 +1120,28 @@
                 </div>
             </div>
 
-            <!-- 手書きペンパレット -->
-            <div>
+            <!-- 手書き計算・下書き用紙キャンバス -->
+            <div class="sketch-wrap">
                 <div class="sidebar-section-title">
-                    <span>✎ 手書き設定</span>
+                    <span>[ 計算・下書き用紙 ]</span>
                     <button class="action-link" id="clearCanvasBtn" style="font-size:0.72rem; border:none; background:none;">全消去</button>
                 </div>
                 <div class="draw-palette">
-                    <span style="font-size:0.75rem;">色:</span>
                     <div class="color-dot active" style="background:#e11d48;" data-color="#e11d48" title="赤"></div>
                     <div class="color-dot" style="background:#2563eb;" data-color="#2563eb" title="青"></div>
-                    <div class="color-dot" style="background:#16a34a;" data-color="#16a34a" title="緑"></div>
-                    <div class="color-dot" style="background:#facc15;" data-color="rgba(250, 204, 21, 0.4)" title="蛍光黄"></div>
+                    <div class="color-dot" style="background:#15803d;" data-color="#15803d" title="緑"></div>
                     <div class="color-dot" style="background:#0f172a; border:1px solid #cbd5e1;" data-color="#0f172a" title="黒"></div>
-                    <button class="btn-theme" id="eraserBtn" style="font-size:0.68rem; padding:2px 6px; margin-left:auto;">消しゴム</button>
+                    <button class="btn-theme" id="eraserBtn" style="font-size:0.68rem; padding:1px 5px; margin-left:auto;">消しゴム</button>
                 </div>
+                <canvas id="sketchCanvas" class="sketch-canvas"></canvas>
             </div>
 
             <!-- 演習メモ欄 -->
             <div style="flex:1; display:flex; flex-direction:column;">
                 <div class="sidebar-section-title">
-                    <span>📝 演習中の一時メモ</span>
+                    <span>[ 演習メモ・反省点 ]</span>
                 </div>
-                <textarea id="tempNoteArea" class="memo-textarea" style="flex:1; min-height:120px;" placeholder="計算の途中メモや解法の下書き..."></textarea>
+                <textarea id="tempNoteArea" class="memo-textarea" style="flex:1; min-height:80px;" placeholder="途中式や解法の要点を記録..."></textarea>
             </div>
         </div>
     </div>
@@ -1163,7 +1161,7 @@
 
 <script>
     /* ═══════════════════════════════════════════════════════════════════
-       🔑 3つの権限とパスワード設定
+       3つの権限とパスワード設定
        ① 一般閲覧用 (和紙ベージュ・DL不可)     : password123
        ② 管理者用 (藍夜ダーク・DL解放)         : password234
        ③ 物理部用 (大正レトロ深緑×焦茶・DL解放) : 114514810
@@ -1352,9 +1350,7 @@
         location.reload();
     });
 
-    /* ═══════════════════════════════════════════════════════════════════
-       🌐 本物のグローバル同期アクセスカウンター
-       ═══════════════════════════════════════════════════════════════════ */
+    /* ── 本物のグローバル同期アクセスカウンター ── */
     async function fetchGlobalVisitorCount() {
         const display = document.getElementById("visitorCount");
         const uniqueKey = "kakomon_archive_portal_2025_prod_v1";
@@ -1372,9 +1368,7 @@
         }
     }
 
-    /* ═══════════════════════════════════════════════════════════════════
-       📝 アーカイブ & 個人演習カルテ機能
-       ═══════════════════════════════════════════════════════════════════ */
+    /* ── アーカイブ & 個人演習カルテ機能 ── */
     const STORAGE_KEY = "exam_portal_store";
     const MEMO_STORAGE_KEY = "exam_portal_user_memos";
 
@@ -1551,33 +1545,78 @@
     };
 
     /* ═══════════════════════════════════════════════════════════════════
-       📐 プレビューモーダル & 演習引き出しサイドバー & 手書き機能
+       プレビューモーダル & 演習引き出しサイドバー & 下書きキャンバス
        ═══════════════════════════════════════════════════════════════════ */
     const modal = document.getElementById("viewerModal");
     const sidebar = document.getElementById("viewerSidebar");
     const toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
-    const toggleDrawBtn = document.getElementById("toggleDrawBtn");
     const clearCanvasBtn = document.getElementById("clearCanvasBtn");
-
-    let isDrawingMode = false;
-    let currentColor = "#e11d48";
-    let isEraser = false;
 
     // サイドバー開閉
     toggleSidebarBtn.addEventListener("click", () => {
         sidebar.classList.toggle("open");
+        setTimeout(resizeSketchCanvas, 100);
     });
 
-    // 手書きモードON/OFF
-    toggleDrawBtn.addEventListener("click", () => {
-        isDrawingMode = !isDrawingMode;
-        modal.classList.toggle("draw-mode-active", isDrawingMode);
-        toggleDrawBtn.textContent = isDrawingMode ? "✎ 手書き: ON" : "✎ 手書き: OFF";
-        toggleDrawBtn.style.background = isDrawingMode ? "var(--accent)" : "var(--surface)";
-        toggleDrawBtn.style.color = isDrawingMode ? "var(--bg)" : "var(--text-main)";
-    });
+    /* ── 確実・高精度な手書き計算キャンバス ── */
+    const canvas = document.getElementById("sketchCanvas");
+    const ctx = canvas.getContext("2d");
+    let painting = false;
+    let currentColor = "#e11d48";
+    let isEraser = false;
 
-    // ペンパレット操作
+    function resizeSketchCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+            // 解像度を保持しながらリサイズ
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            ctx.putImageData(imgData, 0, 0);
+        }
+    }
+
+    function startPosition(e) {
+        painting = true;
+        draw(e);
+    }
+
+    function endPosition() {
+        painting = false;
+        ctx.beginPath();
+    }
+
+    function draw(e) {
+        if (!painting) return;
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+
+        ctx.lineWidth = isEraser ? 16 : 2.5;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        if (isEraser) {
+            ctx.globalCompositeOperation = "destination-out";
+        } else {
+            ctx.globalCompositeOperation = "source-over";
+            ctx.strokeStyle = currentColor;
+        }
+
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    canvas.addEventListener("pointerdown", startPosition);
+    canvas.addEventListener("pointerup", endPosition);
+    canvas.addEventListener("pointermove", draw);
+
+    // 色選択
     document.querySelectorAll(".color-dot").forEach(dot => {
         dot.addEventListener("click", (e) => {
             document.querySelectorAll(".color-dot").forEach(d => d.classList.remove("active"));
@@ -1595,78 +1634,11 @@
         document.getElementById("eraserBtn").style.color = "var(--bg)";
     });
 
-    // キャンバス描画エンジン
-    function setupCanvas(canvas) {
-        const ctx = canvas.getContext("2d");
-        let painting = false;
-
-        function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight - 31;
-        }
-
-        window.addEventListener("resize", resizeCanvas);
-        setTimeout(resizeCanvas, 100);
-
-        function startPosition(e) {
-            if (!isDrawingMode) return;
-            painting = true;
-            draw(e);
-        }
-
-        function endPosition() {
-            painting = false;
-            ctx.beginPath();
-        }
-
-        function draw(e) {
-            if (!painting || !isDrawingMode) return;
-            const rect = canvas.getBoundingClientRect();
-            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-            
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-
-            ctx.lineWidth = isEraser ? 18 : 3;
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
-
-            if (isEraser) {
-                ctx.globalCompositeOperation = "destination-out";
-            } else {
-                ctx.globalCompositeOperation = "source-over";
-                ctx.strokeStyle = currentColor;
-            }
-
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-        }
-
-        canvas.addEventListener("mousedown", startPosition);
-        canvas.addEventListener("mouseup", endPosition);
-        canvas.addEventListener("mousemove", draw);
-
-        canvas.addEventListener("touchstart", startPosition, { passive: true });
-        canvas.addEventListener("touchend", endPosition);
-        canvas.addEventListener("touchmove", draw, { passive: true });
-
-        return ctx;
-    }
-
-    const ctxLeft = setupCanvas(document.getElementById("canvasLeft"));
-    const ctxRight = setupCanvas(document.getElementById("canvasRight"));
-
     clearCanvasBtn.addEventListener("click", () => {
-        const c1 = document.getElementById("canvasLeft");
-        const c2 = document.getElementById("canvasRight");
-        ctxLeft.clearRect(0, 0, c1.width, c1.height);
-        ctxRight.clearRect(0, 0, c2.width, c2.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
 
-    /* ── サイドバー内 50分試験タイマー ── */
+    /* ── サイドバー内 50分演習タイマー ── */
     let sidebarTimerSec = 50 * 60;
     let sidebarTimerInterval = null;
     const sidebarTimerDisplay = document.getElementById("sidebarTimerDisplay");
@@ -1683,7 +1655,7 @@
         if (sidebarTimerInterval) {
             clearInterval(sidebarTimerInterval);
             sidebarTimerInterval = null;
-            sidebarTimerToggleBtn.textContent = "再開";
+            sidebarTimerToggleBtn.textContent = "開始";
         } else {
             sidebarTimerToggleBtn.textContent = "停止";
             sidebarTimerInterval = setInterval(() => {
@@ -1694,7 +1666,7 @@
                     clearInterval(sidebarTimerInterval);
                     sidebarTimerInterval = null;
                     sidebarTimerToggleBtn.textContent = "終了";
-                    alert("【試験時間終了】50分が経過しました。演習お疲れ様でした！");
+                    alert("【試験時間終了】50分が経過しました。演習お疲れ様でした。");
                 }
             }, 1000);
         }
@@ -1708,18 +1680,29 @@
         renderSidebarTimer();
     });
 
-    /* ── プレビュー制御 ── */
+    /* ── プレビュー制御（全ページ別窓リンク完備） ── */
     window.openSplitViewer = function(title, qFile, aFile) {
         modal.classList.remove("single-mode");
         modal.classList.add("split-mode");
 
         document.getElementById("viewerSubjectTitle").textContent = title;
         document.getElementById("paneLeftTitle").textContent = "[問題]";
-        document.getElementById("frameQuestion").src = qFile + "#toolbar=0&navpanes=0";
-        document.getElementById("frameAnswer").src = aFile + "#toolbar=0&navpanes=0";
+        document.getElementById("frameQuestion").src = qFile;
+        document.getElementById("frameAnswer").src = aFile;
+
+        // 別窓リンクをセット
+        const qBtn = document.getElementById("extOpenQBtn");
+        const aBtn = document.getElementById("extOpenABtn");
+        qBtn.href = qFile;
+        qBtn.style.display = "inline-block";
+        qBtn.textContent = "[ 別窓:問題 ↗ ]";
+        aBtn.href = aFile;
+        aBtn.style.display = "inline-block";
+        aBtn.textContent = "[ 別窓:解答 ↗ ]";
 
         modal.classList.add("open");
         addRecent(title, qFile, aFile);
+        setTimeout(resizeSketchCanvas, 200);
     };
 
     window.openSingleViewer = function(title, file, label) {
@@ -1728,10 +1711,18 @@
 
         document.getElementById("viewerSubjectTitle").textContent = title;
         document.getElementById("paneLeftTitle").textContent = label;
-        document.getElementById("frameQuestion").src = file + "#toolbar=0&navpanes=0";
+        document.getElementById("frameQuestion").src = file;
         document.getElementById("frameAnswer").src = "";
 
+        const qBtn = document.getElementById("extOpenQBtn");
+        const aBtn = document.getElementById("extOpenABtn");
+        qBtn.href = file;
+        qBtn.style.display = "inline-block";
+        qBtn.textContent = `[ 別窓:${label} ↗ ]`;
+        aBtn.style.display = "none";
+
         modal.classList.add("open");
+        setTimeout(resizeSketchCanvas, 200);
     };
 
     function closeViewer() {
