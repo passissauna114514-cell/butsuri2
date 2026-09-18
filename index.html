@@ -25,6 +25,8 @@
             --highlight: #f2f4f8;
             --error-color: #991b1b;
             --role-color: #68645d;
+            --card-bg: #fcfbfa;
+            --sidebar-bg: #ffffff;
         }
 
         /* ── ② 管理者用：藍夜ダーク ── */
@@ -44,25 +46,29 @@
             --error-color: #f87171;
             --role-color: #38bdf8;
             --admin-btn: #38bdf8;
+            --card-bg: #151f38;
+            --sidebar-bg: #11182c;
         }
 
         /* ── ③ 物理部用：大正レトロ 深緑×焦茶×金古美 ── */
         body[data-role="physics"] {
             --font-main: 'Zen Old Mincho', 'Klee One', 'Shippori Mincho', serif;
-            --bg: #0b1410;               /* 深い黒緑 */
-            --surface: #122019;          /* 重厚な深緑机 */
+            --bg: #0b1410;               /* 深緑黒 */
+            --surface: #122019;          /* 深緑 */
             --surface-sub: #1a2c24;
-            --border: #3b2c1a;           /* 焦茶・古革色 */
-            --border-dark: #6e5231;      /* 飴色の木製枠 */
-            --text-main: #ebdcc9;        /* 経年変化した古紙色 */
-            --text-sub: #a49783;         /* 枯れたインク色 */
-            --accent: #c49a45;           /* 真鍮・金古美 */
-            --ans-color: #4ade80;        /* 青磁色 */
+            --border: #3b2c1a;           /* 焦茶 */
+            --border-dark: #6e5231;      /* 飴色木枠 */
+            --text-main: #ebdcc9;        /* 古紙色 */
+            --text-sub: #a49783;         /* 枯れインク */
+            --accent: #c49a45;           /* 真鍮金古美 */
+            --ans-color: #4ade80;
             --split-color: #c49a45;
             --highlight: #1e332a;
             --error-color: #e11d48;
             --role-color: #c49a45;
             --admin-btn: #c49a45;
+            --card-bg: #172820;
+            --sidebar-bg: #122019;
         }
 
         * {
@@ -72,18 +78,6 @@
             font-family: var(--font-main, 'Shippori Mincho', serif);
         }
 
-        /* ── 物理部モード特有のレトロ演出 ── */
-        body[data-role="physics"] .exam-section {
-            border: 2px solid var(--border-dark);
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.4);
-        }
-
-        body[data-role="physics"] .view-btn {
-            border: 1px solid var(--border-dark);
-            letter-spacing: 0.05em;
-        }
-
-        /* ── 不正コピー・印刷ガード ── */
         body.protect-mode {
             user-select: none;
             -webkit-user-select: none;
@@ -107,7 +101,7 @@
             transition: background-color 0.25s, color 0.25s;
         }
 
-        /* ── 認証ロック画面 ── */
+        /* ── 認証画面 ── */
         .auth-overlay {
             position: fixed;
             top: 0;
@@ -224,11 +218,24 @@
             gap: 6px;
         }
 
+        .meta-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .counter-badge {
             font-family: 'JetBrains Mono', monospace;
             border: 1px solid var(--border-dark);
             padding: 1px 6px;
             font-weight: 600;
+        }
+
+        .ver-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            border: 1px solid var(--border);
+            padding: 1px 6px;
         }
 
         .header-title-wrap {
@@ -261,6 +268,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
         }
 
         .countdown-chip {
@@ -505,18 +513,20 @@
             width: 100%;
         }
 
+        .file-item-wrap {
+            border-bottom: 1px solid var(--border);
+        }
+        .file-item-wrap:last-child {
+            border-bottom: none;
+        }
+
         .file-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px 16px;
-            border-bottom: 1px solid var(--border);
             gap: 12px;
             transition: background-color 0.15s;
-        }
-
-        .file-row:last-child {
-            border-bottom: none;
         }
 
         .file-row:hover {
@@ -569,6 +579,17 @@
             display: inline-block;
         }
 
+        .btn-memo-toggle {
+            color: var(--text-sub);
+            border-color: var(--border);
+            background: var(--bg);
+        }
+        .btn-memo-toggle.has-data {
+            color: var(--accent);
+            border-color: var(--accent);
+            font-weight: bold;
+        }
+
         .btn-question {
             color: var(--accent);
             border-color: var(--accent);
@@ -612,7 +633,76 @@
             display: inline-block;
         }
 
-        /* ── プレビューモーダル ── */
+        /* ── 個人演習カルテ（メモ枠） ── */
+        .memo-drawer {
+            display: none;
+            background: var(--card-bg);
+            border-top: 1px dashed var(--border);
+            padding: 12px 16px;
+        }
+        .memo-drawer.open {
+            display: block;
+        }
+
+        .memo-drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            font-size: 0.78rem;
+        }
+
+        .memo-inputs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .memo-score-input {
+            width: 50px;
+            padding: 2px 6px;
+            border: 1px solid var(--border-dark);
+            background: var(--surface);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            text-align: right;
+            font-size: 0.85rem;
+        }
+
+        .memo-status-select {
+            padding: 2px 6px;
+            border: 1px solid var(--border-dark);
+            background: var(--surface);
+            color: var(--text-main);
+            font-size: 0.75rem;
+        }
+
+        .memo-date-stamp {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-sub);
+            font-size: 0.72rem;
+        }
+
+        .memo-textarea {
+            width: 100%;
+            min-height: 54px;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-main);
+            font-size: 0.82rem;
+            line-height: 1.5;
+            resize: vertical;
+            outline: none;
+        }
+        .memo-textarea:focus {
+            border-color: var(--accent);
+        }
+
+        /* ── プレビューモーダル & 引き出しサイドバー ── */
         .viewer-modal {
             position: fixed;
             top: 0;
@@ -625,6 +715,7 @@
             display: none;
             flex-direction: column;
             padding: 12px;
+            overflow: hidden;
         }
 
         .viewer-modal.open {
@@ -640,6 +731,8 @@
             align-items: center;
             margin-bottom: 8px;
             flex-shrink: 0;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .viewer-title {
@@ -651,7 +744,17 @@
         .viewer-actions {
             display: flex;
             align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .viewer-layout-wrap {
+            flex: 1;
+            display: flex;
+            position: relative;
+            min-height: 0;
             gap: 8px;
+            overflow: hidden;
         }
 
         .viewer-body {
@@ -659,6 +762,7 @@
             display: grid;
             gap: 8px;
             min-height: 0;
+            transition: margin-right 0.25s ease;
         }
 
         .viewer-modal.single-mode .viewer-body {
@@ -707,6 +811,103 @@
             width: 100%;
             height: 100%;
             border: none;
+        }
+
+        /* ── PDF手書き描画オーバーレイ ── */
+        .pdf-draw-canvas {
+            position: absolute;
+            top: 31px; /* pane-headerの下 */
+            left: 0;
+            width: 100%;
+            height: calc(100% - 31px);
+            pointer-events: none; /* OFF時はPDF操作を妨げない */
+            z-index: 10;
+        }
+        .draw-mode-active .pdf-draw-canvas {
+            pointer-events: auto; /* ON時は描画可能 */
+            cursor: crosshair;
+        }
+
+        /* ── 演習ツール引き出し（サイドバー） ── */
+        .viewer-sidebar {
+            width: 320px;
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border-dark);
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            z-index: 30;
+            transform: translateX(105%);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -4px 0 16px rgba(0,0,0,0.3);
+            padding: 14px;
+            gap: 14px;
+            overflow-y: auto;
+        }
+
+        .viewer-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* サイドバー内タイマー */
+        .sidebar-timer {
+            background: var(--surface-sub);
+            border: 1px solid var(--border);
+            padding: 12px;
+            text-align: center;
+        }
+
+        .sidebar-timer-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-timer-controls {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        /* 手書きペンパレット */
+        .draw-palette {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            background: var(--surface-sub);
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .color-dot.active {
+            border-color: var(--text-main);
+            transform: scale(1.15);
         }
 
         /* ── 日付設定モーダル ── */
@@ -782,10 +983,13 @@
 <div class="container" id="mainContainer">
     <header>
         <div class="header-meta">
-            <span>PERIODICAL EXAMINATION ARCHIVE</span>
             <div>
-                <span>第 <strong id="visitorCount" class="counter-badge">---</strong> 人目の閲覧者</span>
-                <span style="margin-left: 12px;" id="currentDateDisplay">----.--.--</span>
+                <span>PERIODICAL EXAMINATION ARCHIVE</span>
+                <span id="versionBadge" class="ver-badge" style="margin-left: 8px;">v1.0.0</span>
+            </div>
+            <div class="meta-right">
+                <span>第 <strong id="visitorCount" class="counter-badge">1</strong> 人目の閲覧者</span>
+                <span id="currentDateDisplay">----.--.--</span>
             </div>
         </div>
         <div class="header-title-wrap">
@@ -871,23 +1075,76 @@
     <div class="viewer-header">
         <div class="viewer-title" id="viewerSubjectTitle">過去問プレビュー</div>
         <div class="viewer-actions">
+            <!-- 手書き描画切替 -->
+            <button class="btn-theme" id="toggleDrawBtn" style="border-color: var(--accent);">✎ 手書き: OFF</button>
+            <!-- 演習ツール引き出しトグル -->
+            <button class="btn-theme" id="toggleSidebarBtn">演習ツール ◨</button>
             <button class="btn-theme" id="closeViewerBtn">✕ 閉じる (Esc)</button>
         </div>
     </div>
-    <div class="viewer-body">
-        <div class="pane-wrap" id="paneLeft">
-            <div class="pane-header">
-                <span id="paneLeftTitle">[問題]</span>
-                <span style="font-size:0.7rem; color:var(--text-sub);">※ 閲覧専用</span>
+    
+    <div class="viewer-layout-wrap">
+        <div class="viewer-body" id="viewerBody">
+            <div class="pane-wrap" id="paneLeft">
+                <div class="pane-header">
+                    <span id="paneLeftTitle">[問題]</span>
+                    <span style="font-size:0.7rem; color:var(--text-sub);">※ 閲覧専用</span>
+                </div>
+                <iframe id="frameQuestion" src=""></iframe>
+                <!-- 問題用描画キャンバス -->
+                <canvas class="pdf-draw-canvas" id="canvasLeft"></canvas>
             </div>
-            <iframe id="frameQuestion" src=""></iframe>
+            <div class="pane-wrap" id="paneRight">
+                <div class="pane-header">
+                    <span>[模範解答]</span>
+                    <span style="font-size:0.7rem; color:var(--text-sub);">※ 閲覧専用</span>
+                </div>
+                <iframe id="frameAnswer" src=""></iframe>
+                <!-- 解答用描画キャンバス -->
+                <canvas class="pdf-draw-canvas" id="canvasRight"></canvas>
+            </div>
         </div>
-        <div class="pane-wrap" id="paneRight">
-            <div class="pane-header">
-                <span>[模範解答]</span>
-                <span style="font-size:0.7rem; color:var(--text-sub);">※ 閲覧専用</span>
+
+        <!-- 演習ツール（横から引き出せるサイドバー） -->
+        <div class="viewer-sidebar" id="viewerSidebar">
+            <!-- 50分試験タイマー -->
+            <div>
+                <div class="sidebar-section-title">
+                    <span>⏱️ 50分 演習タイマー</span>
+                </div>
+                <div class="sidebar-timer">
+                    <div class="sidebar-timer-time" id="sidebarTimerDisplay">50:00</div>
+                    <div class="sidebar-timer-controls">
+                        <button class="btn-theme" id="sidebarTimerToggleBtn">開始</button>
+                        <button class="btn-theme" id="sidebarTimerResetBtn">リセット</button>
+                    </div>
+                </div>
             </div>
-            <iframe id="frameAnswer" src=""></iframe>
+
+            <!-- 手書きペンパレット -->
+            <div>
+                <div class="sidebar-section-title">
+                    <span>✎ 手書き設定</span>
+                    <button class="action-link" id="clearCanvasBtn" style="font-size:0.72rem; border:none; background:none;">全消去</button>
+                </div>
+                <div class="draw-palette">
+                    <span style="font-size:0.75rem;">色:</span>
+                    <div class="color-dot active" style="background:#e11d48;" data-color="#e11d48" title="赤"></div>
+                    <div class="color-dot" style="background:#2563eb;" data-color="#2563eb" title="青"></div>
+                    <div class="color-dot" style="background:#16a34a;" data-color="#16a34a" title="緑"></div>
+                    <div class="color-dot" style="background:#facc15;" data-color="rgba(250, 204, 21, 0.4)" title="蛍光黄"></div>
+                    <div class="color-dot" style="background:#0f172a; border:1px solid #cbd5e1;" data-color="#0f172a" title="黒"></div>
+                    <button class="btn-theme" id="eraserBtn" style="font-size:0.68rem; padding:2px 6px; margin-left:auto;">消しゴム</button>
+                </div>
+            </div>
+
+            <!-- 演習メモ欄 -->
+            <div style="flex:1; display:flex; flex-direction:column;">
+                <div class="sidebar-section-title">
+                    <span>📝 演習中の一時メモ</span>
+                </div>
+                <textarea id="tempNoteArea" class="memo-textarea" style="flex:1; min-height:120px;" placeholder="計算の途中メモや解法の下書き..."></textarea>
+            </div>
         </div>
     </div>
 </div>
@@ -909,7 +1166,7 @@
        🔑 3つの権限とパスワード設定
        ① 一般閲覧用 (和紙ベージュ・DL不可)     : password123
        ② 管理者用 (藍夜ダーク・DL解放)         : password234
-       ③ 物理部用 (大正レトロ深緑×焦茶・DL解放) : physics2025
+       ③ 物理部用 (大正レトロ深緑×焦茶・DL解放) : 114514810
        ═══════════════════════════════════════════════════════════════════ */
     const RAW_MASTER_DATA = [
         {
@@ -920,18 +1177,18 @@
             name: "2025年度 第1学年 前期期末考査",
             nameOld: "2025年度 第1學年 前期期末考査",
             items: [
-                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_1_数1_問.pdf", aFile: "2025_1_1_数1_解.pdf" },
-                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_1_数A_問.pdf", aFile: "2025_1_1_数A_解.pdf" },
-                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_1_現国_問.pdf", aFile: "2025_1_1_現国_解.pdf" },
-                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_1_言文_問.pdf", aFile: "2025_1_1_言文_解.pdf" },
-                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_1_EC_問.pdf", aFile: "2025_1_1_EC_解.pdf" },
-                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_1_LE_問.pdf", aFile: "2025_1_1_LE_解.pdf" },
-                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_1_物基_問.pdf", aFile: "2025_1_1_物基_解.pdf" },
-                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_1_生基_問.pdf", aFile: "2025_1_1_生基_解.pdf" },
-                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_1_地総_問.pdf", aFile: "2025_1_1_地総_解.pdf" },
-                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_1_歴総_問.pdf", aFile: "2025_1_1_歴総_解.pdf" },
-                { name: "保健", cat: "sub", tag: "保体", qFile: "2025_1_1_保健_問.pdf", aFile: "2025_1_1_保健_解.pdf" },
-                { name: "家庭", cat: "sub", tag: "家庭", qFile: "2025_1_1_家庭_問.pdf", aFile: "2025_1_1_家庭_解.pdf" }
+                { id: "2025_1_1_m1", name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_1_数1_問.pdf", aFile: "2025_1_1_数1_解.pdf" },
+                { id: "2025_1_1_ma", name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_1_数A_問.pdf", aFile: "2025_1_1_数A_解.pdf" },
+                { id: "2025_1_1_kj", name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_1_現国_問.pdf", aFile: "2025_1_1_現国_解.pdf" },
+                { id: "2025_1_1_kb", name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_1_言文_問.pdf", aFile: "2025_1_1_言文_解.pdf" },
+                { id: "2025_1_1_ec", name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_1_EC_問.pdf", aFile: "2025_1_1_EC_解.pdf" },
+                { id: "2025_1_1_le", name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_1_LE_問.pdf", aFile: "2025_1_1_LE_解.pdf" },
+                { id: "2025_1_1_ph", name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_1_物基_問.pdf", aFile: "2025_1_1_物基_解.pdf" },
+                { id: "2025_1_1_bi", name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_1_生基_問.pdf", aFile: "2025_1_1_生基_解.pdf" },
+                { id: "2025_1_1_ge", name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_1_地総_問.pdf", aFile: "2025_1_1_地総_解.pdf" },
+                { id: "2025_1_1_hi", name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_1_歴総_問.pdf", aFile: "2025_1_1_歴総_解.pdf" },
+                { id: "2025_1_1_hk", name: "保健", cat: "sub", tag: "保体", qFile: "2025_1_1_保健_問.pdf", aFile: "2025_1_1_保健_解.pdf" },
+                { id: "2025_1_1_kt", name: "家庭", cat: "sub", tag: "家庭", qFile: "2025_1_1_家庭_問.pdf", aFile: "2025_1_1_家庭_解.pdf" }
             ]
         },
         {
@@ -942,16 +1199,16 @@
             name: "2025年度 第1学年 前期中間考査",
             nameOld: "2025年度 第1學年 前期中間考査",
             items: [
-                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_2_数1_問.pdf", aFile: "2025_1_2_数1_解.pdf" },
-                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_2_数A_問.pdf", aFile: "2025_1_2_数A_解.pdf" },
-                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_2_現国_問.pdf", aFile: "2025_1_2_現国_解.pdf" },
-                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_2_言文_問.pdf", aFile: "2025_1_2_言文_解.pdf" },
-                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_2_EC_問.pdf", aFile: "2025_1_2_EC_解.pdf" },
-                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_2_LE_問.pdf", aFile: "2025_1_2_LE_解.pdf" },
-                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_2_物基_問.pdf", aFile: "2025_1_2_物基_解.pdf" },
-                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_2_生基_問.pdf", aFile: "2025_1_2_生基_解.pdf" },
-                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_2_地総_問.pdf", aFile: "2025_1_2_地総_解.pdf" },
-                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_2_歴総_問.pdf", aFile: "2025_1_2_歴総_解.pdf" }
+                { id: "2025_1_2_m1", name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_2_数1_問.pdf", aFile: "2025_1_2_数1_解.pdf" },
+                { id: "2025_1_2_ma", name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_2_数A_問.pdf", aFile: "2025_1_2_数A_解.pdf" },
+                { id: "2025_1_2_kj", name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_2_現国_問.pdf", aFile: "2025_1_2_現国_解.pdf" },
+                { id: "2025_1_2_kb", name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_2_言文_問.pdf", aFile: "2025_1_2_言文_解.pdf" },
+                { id: "2025_1_2_ec", name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_2_EC_問.pdf", aFile: "2025_1_2_EC_解.pdf" },
+                { id: "2025_1_2_le", name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_2_LE_問.pdf", aFile: "2025_1_2_LE_解.pdf" },
+                { id: "2025_1_2_ph", name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_2_物基_問.pdf", aFile: "2025_1_2_物基_解.pdf" },
+                { id: "2025_1_2_bi", name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_2_生基_問.pdf", aFile: "2025_1_2_生基_解.pdf" },
+                { id: "2025_1_2_ge", name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_2_地総_問.pdf", aFile: "2025_1_2_地総_解.pdf" },
+                { id: "2025_1_2_hi", name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_2_歴総_問.pdf", aFile: "2025_1_2_歴総_解.pdf" }
             ]
         },
         {
@@ -962,16 +1219,16 @@
             name: "2025年度 第1学年 後期中間考査",
             nameOld: "2025年度 第1學年 後期中間考査",
             items: [
-                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_3_数1_問.pdf", aFile: "2025_1_3_数1_解.pdf" },
-                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_3_数A_問.pdf", aFile: "2025_1_3_数A_解.pdf" },
-                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_3_現国_問.pdf", aFile: "2025_1_3_現国_解.pdf" },
-                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_3_言文_問.pdf", aFile: "2025_1_3_言文_解.pdf" },
-                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_3_EC_問.pdf", aFile: "2025_1_3_EC_解.pdf" },
-                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_3_LE_問.pdf", aFile: "2025_1_3_LE_解.pdf" },
-                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_3_物基_問.pdf", aFile: "2025_1_3_物基_解.pdf" },
-                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_3_生基_問.pdf", aFile: "2025_1_3_生基_解.pdf" },
-                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_3_地総_問.pdf", aFile: "2025_1_3_地総_解.pdf" },
-                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_3_歴総_問.pdf", aFile: "2025_1_3_歴総_解.pdf" }
+                { id: "2025_1_3_m1", name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_3_数1_問.pdf", aFile: "2025_1_3_数1_解.pdf" },
+                { id: "2025_1_3_ma", name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_3_数A_問.pdf", aFile: "2025_1_3_数A_解.pdf" },
+                { id: "2025_1_3_kj", name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_3_現国_問.pdf", aFile: "2025_1_3_現国_解.pdf" },
+                { id: "2025_1_3_kb", name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_3_言文_問.pdf", aFile: "2025_1_3_言文_解.pdf" },
+                { id: "2025_1_3_ec", name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_3_EC_問.pdf", aFile: "2025_1_3_EC_解.pdf" },
+                { id: "2025_1_3_le", name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_3_LE_問.pdf", aFile: "2025_1_3_LE_解.pdf" },
+                { id: "2025_1_3_ph", name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_3_物基_問.pdf", aFile: "2025_1_3_物基_解.pdf" },
+                { id: "2025_1_3_bi", name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_3_生基_問.pdf", aFile: "2025_1_3_生基_解.pdf" },
+                { id: "2025_1_3_ge", name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_3_地総_問.pdf", aFile: "2025_1_3_地総_解.pdf" },
+                { id: "2025_1_3_hi", name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_3_歴総_問.pdf", aFile: "2025_1_3_歴総_解.pdf" }
             ]
         },
         {
@@ -982,18 +1239,18 @@
             name: "2025年度 第1学年 後期末考査",
             nameOld: "2025年度 第1學年 後期末考査",
             items: [
-                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_4_数1_問.pdf", aFile: "2025_1_4_数1_解.pdf" },
-                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_4_数A_問.pdf", aFile: "2025_1_4_数A_解.pdf" },
-                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_4_現国_問.pdf", aFile: "2025_1_4_現国_解.pdf" },
-                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_4_言文_問.pdf", aFile: "2025_1_4_言文_解.pdf" },
-                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_4_EC_問.pdf", aFile: "2025_1_4_EC_解.pdf" },
-                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_4_LE_問.pdf", aFile: "2025_1_4_LE_解.pdf" },
-                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_4_物基_問.pdf", aFile: "2025_1_4_物基_解.pdf" },
-                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_4_生基_問.pdf", aFile: "2025_1_4_生基_解.pdf" },
-                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_4_地総_問.pdf", aFile: "2025_1_4_地総_解.pdf" },
-                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_4_歴総_問.pdf", aFile: "2025_1_4_歴総_解.pdf" },
-                { name: "保健", cat: "sub", tag: "保体", qFile: "2025_1_4_保健_問.pdf", aFile: "2025_1_4_保健_解.pdf" },
-                { name: "家庭", cat: "sub", tag: "家庭", qFile: "2025_1_4_家庭_問.pdf", aFile: "2025_1_4_家庭_解.pdf" }
+                { id: "2025_1_4_m1", name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_4_数1_問.pdf", aFile: "2025_1_4_数1_解.pdf" },
+                { id: "2025_1_4_ma", name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_4_数A_問.pdf", aFile: "2025_1_4_数A_解.pdf" },
+                { id: "2025_1_4_kj", name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_4_現国_問.pdf", aFile: "2025_1_4_現国_解.pdf" },
+                { id: "2025_1_4_kb", name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_4_言文_問.pdf", aFile: "2025_1_4_言文_解.pdf" },
+                { id: "2025_1_4_ec", name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_4_EC_問.pdf", aFile: "2025_1_4_EC_解.pdf" },
+                { id: "2025_1_4_le", name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_4_LE_問.pdf", aFile: "2025_1_4_LE_解.pdf" },
+                { id: "2025_1_4_ph", name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_4_物基_問.pdf", aFile: "2025_1_4_物基_解.pdf" },
+                { id: "2025_1_4_bi", name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_4_生基_問.pdf", aFile: "2025_1_4_生基_解.pdf" },
+                { id: "2025_1_4_ge", name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_4_地総_問.pdf", aFile: "2025_1_4_地総_解.pdf" },
+                { id: "2025_1_4_hi", name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_4_歴総_問.pdf", aFile: "2025_1_4_歴総_解.pdf" },
+                { id: "2025_1_4_hk", name: "保健", cat: "sub", tag: "保体", qFile: "2025_1_4_保健_問.pdf", aFile: "2025_1_4_保健_解.pdf" },
+                { id: "2025_1_4_kt", name: "家庭", cat: "sub", tag: "家庭", qFile: "2025_1_4_家庭_問.pdf", aFile: "2025_1_4_家庭_解.pdf" }
             ]
         }
     ];
@@ -1025,7 +1282,7 @@
             return;
         }
 
-        if (input === "physics2025") {
+        if (input === "114514810") {
             currentUserRole = "physics";
             grantAccess();
             return;
@@ -1049,6 +1306,7 @@
         const badge = document.getElementById("roleBadge");
         const title = document.getElementById("mainTitle");
         const recentLabel = document.getElementById("recentLabel");
+        const verBadge = document.getElementById("versionBadge");
 
         if (currentUserRole === "admin") {
             document.body.classList.add("has-download-privilege");
@@ -1056,25 +1314,27 @@
             badge.textContent = "管理者";
             title.innerHTML = `定期考査 過去問題録 <span id="roleBadge" class="role-tag">管理者</span>`;
             recentLabel.textContent = "最近の閲覧:";
+            verBadge.textContent = "v1.0.0";
         } else if (currentUserRole === "physics") {
             document.body.classList.add("has-download-privilege");
             document.body.classList.remove("protect-mode");
             badge.textContent = "物理部";
-            // 物理部モード時は格調高い大正・旧字体タイトルに切り替え
             title.innerHTML = `定期考査 過去問録 <span id="roleBadge" class="role-tag">物理部</span>`;
             recentLabel.textContent = "最近ノ閱覽:";
+            verBadge.textContent = "第壱版 (v1.0.0)";
         } else {
             document.body.classList.remove("has-download-privilege");
             document.body.classList.add("protect-mode");
             badge.textContent = "一般閲覧";
             title.innerHTML = `定期考査 過去問題録 <span id="roleBadge" class="role-tag">一般閲覧</span>`;
             recentLabel.textContent = "最近の閲覧:";
+            verBadge.textContent = "v1.0.0";
         }
 
         document.getElementById("authScreen").style.display = "none";
         document.getElementById("mainContainer").style.display = "block";
 
-        fetchVisitorCount();
+        fetchGlobalVisitorCount();
         loadState();
         renderArchive();
     }
@@ -1092,32 +1352,47 @@
         location.reload();
     });
 
-    /* ── アクセスカウンター ── */
-    async function fetchVisitorCount() {
+    /* ═══════════════════════════════════════════════════════════════════
+       🌐 本物のグローバル同期アクセスカウンター
+       ═══════════════════════════════════════════════════════════════════ */
+    async function fetchGlobalVisitorCount() {
         const display = document.getElementById("visitorCount");
+        const uniqueKey = "kakomon_archive_portal_2025_prod_v1";
+
         try {
-            const res = await fetch("https://api.counterapi.dev/v1/exam_archive_portal_2025/visits/up");
+            const res = await fetch(`https://countapi.mileshilliard.com/api/v1/hit/${uniqueKey}`);
             const data = await res.json();
-            display.textContent = data.count.toLocaleString();
+            if (data && data.value) {
+                display.textContent = Number(data.value).toLocaleString();
+            } else {
+                display.textContent = "1";
+            }
         } catch (e) {
-            let count = parseInt(localStorage.getItem("local_visit_count") || "128");
-            count++;
-            localStorage.setItem("local_visit_count", count.toString());
-            display.textContent = count.toLocaleString();
+            display.textContent = "1";
         }
     }
 
-    /* ── アーカイブ機能 ── */
+    /* ═══════════════════════════════════════════════════════════════════
+       📝 アーカイブ & 個人演習カルテ機能
+       ═══════════════════════════════════════════════════════════════════ */
     const STORAGE_KEY = "exam_portal_store";
+    const MEMO_STORAGE_KEY = "exam_portal_user_memos";
+
     let state = {
         targetDate: "",
         recent: []
     };
 
+    let userMemos = {};
+
     function loadState() {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
             try { state = Object.assign(state, JSON.parse(raw)); } catch(e){}
+        }
+        const rawMemos = localStorage.getItem(MEMO_STORAGE_KEY);
+        if (rawMemos) {
+            try { userMemos = JSON.parse(rawMemos); } catch(e){}
         }
         renderRecent();
         updateCountdown();
@@ -1125,6 +1400,10 @@
 
     function saveState() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function saveMemos() {
+        localStorage.setItem(MEMO_STORAGE_KEY, JSON.stringify(userMemos));
     }
 
     function addRecent(title, qFile, aFile) {
@@ -1197,22 +1476,50 @@
             table.className = "file-table";
 
             matchedItems.forEach(item => {
-                const row = document.createElement("div");
-                row.className = "file-row";
-                row.innerHTML = `
-                    <div class="row-left">
-                        <span class="subj-tag">${item.tag}</span>
-                        <span class="subj-title">${item.name}</span>
+                const memo = userMemos[item.id] || { score: "", status: "未着手", date: "", text: "" };
+                const hasData = Boolean(memo.score || memo.text || (memo.status && memo.status !== "未着手"));
+
+                const memoBtnLabel = currentUserRole === "physics" ? "日誌" : "カルテ";
+                const memoDrawerTitle = currentUserRole === "physics" ? "【 實驗・演習日誌 】" : "【 個人演習カルテ・備忘録 】";
+
+                const wrap = document.createElement("div");
+                wrap.className = "file-item-wrap";
+                wrap.innerHTML = `
+                    <div class="file-row">
+                        <div class="row-left">
+                            <span class="subj-tag">${item.tag}</span>
+                            <span class="subj-title">${item.name}</span>
+                        </div>
+                        <div class="row-right">
+                            <button class="view-btn btn-memo-toggle ${hasData ? 'has-data' : ''}" onclick="toggleMemo('${item.id}')">${memoBtnLabel}</button>
+                            <button class="view-btn btn-split" onclick="openSplitViewer('${section.name}・${item.name}', '${item.qFile}', '${item.aFile}')">並べて表示</button>
+                            <button class="view-btn btn-question" onclick="openSingleViewer('${section.name}・${item.name} [問題]', '${item.qFile}', '[問題]')">問題</button>
+                            <button class="view-btn btn-answer" onclick="openSingleViewer('${section.name}・${item.name} [解答]', '${item.aFile}', '[模範解答]')">解答</button>
+                            <a href="${item.qFile}" download class="view-btn btn-download" title="ダウンロード">DL問</a>
+                            <a href="${item.aFile}" download class="view-btn btn-download" title="ダウンロード">DL解</a>
+                        </div>
                     </div>
-                    <div class="row-right">
-                        <button class="view-btn btn-split" onclick="openSplitViewer('${section.name}・${item.name}', '${item.qFile}', '${item.aFile}')">並べて表示</button>
-                        <button class="view-btn btn-question" onclick="openSingleViewer('${section.name}・${item.name} [問題]', '${item.qFile}', '[問題]')">問題</button>
-                        <button class="view-btn btn-answer" onclick="openSingleViewer('${section.name}・${item.name} [解答]', '${item.aFile}', '[模範解答]')">解答</button>
-                        <a href="${item.qFile}" download class="view-btn btn-download" title="ダウンロード">DL問</a>
-                        <a href="${item.aFile}" download class="view-btn btn-download" title="ダウンロード">DL解</a>
+                    <!-- 個人カルテ（メモ枠） -->
+                    <div class="memo-drawer" id="memo-drawer-${item.id}">
+                        <div class="memo-drawer-header">
+                            <span style="font-weight:bold; color:var(--text-main);">${memoDrawerTitle}</span>
+                            <div class="memo-inputs">
+                                <span>得点:</span>
+                                <input type="number" class="memo-score-input" min="0" max="100" placeholder="--" value="${memo.score}" onchange="updateMemoField('${item.id}', 'score', this.value)">
+                                <span>/ 100点</span>
+                                <select class="memo-status-select" onchange="updateMemoField('${item.id}', 'status', this.value)">
+                                    <option value="未着手" ${memo.status === '未着手' ? 'selected' : ''}>未着手</option>
+                                    <option value="演習済" ${memo.status === '演習済' ? 'selected' : ''}>演習済</option>
+                                    <option value="要解き直し" ${memo.status === '要解き直し' ? 'selected' : ''}>要解き直し</option>
+                                    <option value="完璧" ${memo.status === '完璧' ? 'selected' : ''}>完璧</option>
+                                </select>
+                                <span class="memo-date-stamp">${memo.date ? '実施日: ' + memo.date : ''}</span>
+                            </div>
+                        </div>
+                        <textarea class="memo-textarea" placeholder="間違えた問題、反省点、次回解く時の注意点などをメモ（入力時に自動保存されます）" oninput="updateMemoField('${item.id}', 'text', this.value)">${memo.text}</textarea>
                     </div>
                 `;
-                table.appendChild(row);
+                table.appendChild(wrap);
             });
 
             details.appendChild(table);
@@ -1223,9 +1530,186 @@
         document.getElementById("noRecords").style.display = matchCount === 0 ? "block" : "none";
     }
 
+    /* ── カルテ操作 ── */
+    window.toggleMemo = function(id) {
+        const drawer = document.getElementById(`memo-drawer-${id}`);
+        drawer.classList.toggle("open");
+    };
+
+    window.updateMemoField = function(id, field, value) {
+        if (!userMemos[id]) {
+            userMemos[id] = { score: "", status: "未着手", date: "", text: "" };
+        }
+        userMemos[id][field] = value.trim();
+
+        if (!userMemos[id].date) {
+            const d = new Date();
+            userMemos[id].date = `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
+        }
+
+        saveMemos();
+    };
+
+    /* ═══════════════════════════════════════════════════════════════════
+       📐 プレビューモーダル & 演習引き出しサイドバー & 手書き機能
+       ═══════════════════════════════════════════════════════════════════ */
+    const modal = document.getElementById("viewerModal");
+    const sidebar = document.getElementById("viewerSidebar");
+    const toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
+    const toggleDrawBtn = document.getElementById("toggleDrawBtn");
+    const clearCanvasBtn = document.getElementById("clearCanvasBtn");
+
+    let isDrawingMode = false;
+    let currentColor = "#e11d48";
+    let isEraser = false;
+
+    // サイドバー開閉
+    toggleSidebarBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+    });
+
+    // 手書きモードON/OFF
+    toggleDrawBtn.addEventListener("click", () => {
+        isDrawingMode = !isDrawingMode;
+        modal.classList.toggle("draw-mode-active", isDrawingMode);
+        toggleDrawBtn.textContent = isDrawingMode ? "✎ 手書き: ON" : "✎ 手書き: OFF";
+        toggleDrawBtn.style.background = isDrawingMode ? "var(--accent)" : "var(--surface)";
+        toggleDrawBtn.style.color = isDrawingMode ? "var(--bg)" : "var(--text-main)";
+    });
+
+    // ペンパレット操作
+    document.querySelectorAll(".color-dot").forEach(dot => {
+        dot.addEventListener("click", (e) => {
+            document.querySelectorAll(".color-dot").forEach(d => d.classList.remove("active"));
+            e.target.classList.add("active");
+            currentColor = e.target.dataset.color;
+            isEraser = false;
+            document.getElementById("eraserBtn").style.background = "none";
+        });
+    });
+
+    document.getElementById("eraserBtn").addEventListener("click", () => {
+        isEraser = true;
+        document.querySelectorAll(".color-dot").forEach(d => d.classList.remove("active"));
+        document.getElementById("eraserBtn").style.background = "var(--text-main)";
+        document.getElementById("eraserBtn").style.color = "var(--bg)";
+    });
+
+    // キャンバス描画エンジン
+    function setupCanvas(canvas) {
+        const ctx = canvas.getContext("2d");
+        let painting = false;
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight - 31;
+        }
+
+        window.addEventListener("resize", resizeCanvas);
+        setTimeout(resizeCanvas, 100);
+
+        function startPosition(e) {
+            if (!isDrawingMode) return;
+            painting = true;
+            draw(e);
+        }
+
+        function endPosition() {
+            painting = false;
+            ctx.beginPath();
+        }
+
+        function draw(e) {
+            if (!painting || !isDrawingMode) return;
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            ctx.lineWidth = isEraser ? 18 : 3;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+
+            if (isEraser) {
+                ctx.globalCompositeOperation = "destination-out";
+            } else {
+                ctx.globalCompositeOperation = "source-over";
+                ctx.strokeStyle = currentColor;
+            }
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        canvas.addEventListener("mousedown", startPosition);
+        canvas.addEventListener("mouseup", endPosition);
+        canvas.addEventListener("mousemove", draw);
+
+        canvas.addEventListener("touchstart", startPosition, { passive: true });
+        canvas.addEventListener("touchend", endPosition);
+        canvas.addEventListener("touchmove", draw, { passive: true });
+
+        return ctx;
+    }
+
+    const ctxLeft = setupCanvas(document.getElementById("canvasLeft"));
+    const ctxRight = setupCanvas(document.getElementById("canvasRight"));
+
+    clearCanvasBtn.addEventListener("click", () => {
+        const c1 = document.getElementById("canvasLeft");
+        const c2 = document.getElementById("canvasRight");
+        ctxLeft.clearRect(0, 0, c1.width, c1.height);
+        ctxRight.clearRect(0, 0, c2.width, c2.height);
+    });
+
+    /* ── サイドバー内 50分試験タイマー ── */
+    let sidebarTimerSec = 50 * 60;
+    let sidebarTimerInterval = null;
+    const sidebarTimerDisplay = document.getElementById("sidebarTimerDisplay");
+    const sidebarTimerToggleBtn = document.getElementById("sidebarTimerToggleBtn");
+    const sidebarTimerResetBtn = document.getElementById("sidebarTimerResetBtn");
+
+    function renderSidebarTimer() {
+        const m = String(Math.floor(sidebarTimerSec / 60)).padStart(2, "0");
+        const s = String(sidebarTimerSec % 60).padStart(2, "0");
+        sidebarTimerDisplay.textContent = `${m}:${s}`;
+    }
+
+    sidebarTimerToggleBtn.addEventListener("click", () => {
+        if (sidebarTimerInterval) {
+            clearInterval(sidebarTimerInterval);
+            sidebarTimerInterval = null;
+            sidebarTimerToggleBtn.textContent = "再開";
+        } else {
+            sidebarTimerToggleBtn.textContent = "停止";
+            sidebarTimerInterval = setInterval(() => {
+                if (sidebarTimerSec > 0) {
+                    sidebarTimerSec--;
+                    renderSidebarTimer();
+                } else {
+                    clearInterval(sidebarTimerInterval);
+                    sidebarTimerInterval = null;
+                    sidebarTimerToggleBtn.textContent = "終了";
+                    alert("【試験時間終了】50分が経過しました。演習お疲れ様でした！");
+                }
+            }, 1000);
+        }
+    });
+
+    sidebarTimerResetBtn.addEventListener("click", () => {
+        clearInterval(sidebarTimerInterval);
+        sidebarTimerInterval = null;
+        sidebarTimerSec = 50 * 60;
+        sidebarTimerToggleBtn.textContent = "開始";
+        renderSidebarTimer();
+    });
+
     /* ── プレビュー制御 ── */
     window.openSplitViewer = function(title, qFile, aFile) {
-        const modal = document.getElementById("viewerModal");
         modal.classList.remove("single-mode");
         modal.classList.add("split-mode");
 
@@ -1239,7 +1723,6 @@
     };
 
     window.openSingleViewer = function(title, file, label) {
-        const modal = document.getElementById("viewerModal");
         modal.classList.remove("split-mode");
         modal.classList.add("single-mode");
 
@@ -1252,7 +1735,8 @@
     };
 
     function closeViewer() {
-        document.getElementById("viewerModal").classList.remove("open");
+        modal.classList.remove("open");
+        sidebar.classList.remove("open");
         document.getElementById("frameQuestion").src = "";
         document.getElementById("frameAnswer").src = "";
     }
@@ -1333,7 +1817,7 @@
     document.getElementById("currentDateDisplay").textContent = 
         `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
 
-    // セッション復帰
+    // 起動時セッション確認
     (function checkSession() {
         const savedRole = sessionStorage.getItem("exam_auth_role");
         if (["admin", "physics", "viewer"].includes(savedRole)) {
