@@ -21,8 +21,9 @@
             --border-dark: #8c857b;
             --text-main: #23221e;
             --text-sub: #68645d;
-            --accent: #1e3a8a; /* 藍色 */
-            --ans-color: #065f46; /* 深緑 */
+            --accent: #1e3a8a;
+            --ans-color: #065f46;
+            --admin-color: #854d0e;
             --split-color: #4b5563;
             --highlight: #f2f4f8;
             --error-color: #991b1b;
@@ -35,6 +36,1279 @@
             --border: #383d47;
             --border-dark: #636b7b;
             --text-main: #eae8e1;
+            --text-sub: #9ca3af;
+            --accent: #60a5fa;
+            --ans-color: #34d399;
+            --admin-color: #fbbf24;
+            --split-color: #9ca3af;
+            --highlight: #1e293b;
+            --error-color: #f87171;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ── 一般閲覧時の印刷抑制 ── */
+        @media print {
+            body.protect-mode {
+                display: none !important;
+            }
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-mincho);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 28px 16px 80px 16px;
+            transition: background-color 0.25s, color 0.25s;
+        }
+
+        /* ── 認証ロック画面 ── */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+
+        .auth-card {
+            background: var(--surface);
+            border: 1px solid var(--border-dark);
+            padding: 36px 28px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .auth-badge {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            color: var(--text-sub);
+            border: 1px solid var(--border);
+            padding: 2px 8px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .auth-card h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
+
+        .auth-card p {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            margin-bottom: 24px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-dark);
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 0.15em;
+            outline: none;
+            margin-bottom: 12px;
+        }
+
+        .auth-input:focus {
+            border-color: var(--accent);
+        }
+
+        .auth-btn {
+            width: 100%;
+            background: var(--text-main);
+            color: var(--bg);
+            border: none;
+            padding: 10px;
+            font-family: var(--font-mincho);
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .auth-btn:hover {
+            opacity: 0.85;
+        }
+
+        .auth-error {
+            color: var(--error-color);
+            font-size: 0.78rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* ── メインコンテナ ── */
+        .container {
+            width: 100%;
+            max-width: 960px;
+            display: none;
+        }
+
+        header {
+            border-bottom: 2px solid var(--text-main);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .counter-badge {
+            font-family: var(--font-mono);
+            border: 1px solid var(--border-dark);
+            padding: 1px 6px;
+            font-weight: 600;
+        }
+
+        .header-title-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        .role-tag {
+            font-family: var(--font-ui);
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border: 1px solid var(--border-dark);
+            margin-left: 8px;
+            vertical-align: middle;
+            font-weight: normal;
+        }
+
+        .role-admin {
+            border-color: var(--admin-color);
+            color: var(--admin-color);
+            font-weight: bold;
+        }
+
+        .header-tools {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .countdown-chip {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            background: var(--surface);
+            border: 1px solid var(--border-dark);
+            padding: 4px 10px;
+            cursor: pointer;
+            display: inline-flex;
+            gap: 6px;
+            align-items: baseline;
+        }
+
+        .countdown-chip strong {
+            color: var(--accent);
+            font-size: 0.95rem;
+        }
+
+        .btn-theme {
+            background: var(--surface);
+            border: 1px solid var(--border-dark);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-theme:hover {
+            background: var(--text-main);
+            color: var(--surface);
+        }
+
+        /* ── 最近閲覧した履歴 ── */
+        .recent-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .recent-label {
+            font-weight: 600;
+            color: var(--text-sub);
+            flex-shrink: 0;
+            font-size: 0.75rem;
+        }
+
+        .recent-items {
+            display: flex;
+            gap: 6px;
+        }
+
+        .recent-chip {
+            background: var(--surface-sub);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: border-color 0.15s;
+        }
+
+        .recent-chip:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ── Controls (Search / Filters) ── */
+        .filter-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .filter-main-row {
+            display: grid;
+            grid-template-columns: 140px 140px 1fr;
+            gap: 8px;
+        }
+
+        @media (max-width: 640px) {
+            .filter-main-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .search-input-wrap {
+                grid-column: span 2;
+            }
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-dark);
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-mincho);
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-dark);
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-mincho);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .search-input:focus, .filter-select:focus {
+            border-color: var(--accent);
+        }
+
+        .filter-sub-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            width: 50px;
+            flex-shrink: 0;
+        }
+
+        .filter-chip {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            font-family: var(--font-mincho);
+            font-size: 0.78rem;
+            padding: 3px 9px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+
+        .filter-chip.active {
+            background: var(--text-main);
+            border-color: var(--text-main);
+            color: var(--bg);
+            font-weight: 600;
+        }
+
+        .panel-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.78rem;
+            color: var(--text-sub);
+            border-top: 1px dashed var(--border);
+            padding-top: 10px;
+            margin-top: 4px;
+        }
+
+        .action-link {
+            color: var(--accent);
+            text-decoration: none;
+            cursor: pointer;
+            margin-left: 8px;
+            border-bottom: 1px dotted var(--accent);
+        }
+
+        /* ── Exam Accordion Section ── */
+        .exam-section {
+            border: 1px solid var(--border);
+            background: var(--surface);
+            margin-bottom: 16px;
+        }
+
+        .exam-section[open] summary {
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-sub);
+        }
+
+        summary {
+            padding: 14px 18px;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            font-weight: 600;
+            transition: background 0.15s;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05rem;
+            letter-spacing: 0.04em;
+        }
+
+        .section-count {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: normal;
+        }
+
+        .toggle-icon {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+
+        .file-table {
+            width: 100%;
+        }
+
+        .file-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            gap: 12px;
+            transition: background-color 0.15s;
+        }
+
+        .file-row:last-child {
+            border-bottom: none;
+        }
+
+        .file-row:hover {
+            background-color: var(--highlight);
+        }
+
+        .row-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .row-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .subj-tag {
+            font-family: var(--font-ui);
+            font-size: 0.68rem;
+            color: var(--text-sub);
+            border: 1px solid var(--border);
+            padding: 1px 6px;
+            border-radius: 2px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .subj-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .view-btn {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 9px;
+            border: 1px solid var(--border-dark);
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-question {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        .btn-question:hover {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .btn-answer {
+            color: var(--ans-color);
+            border-color: var(--ans-color);
+        }
+        .btn-answer:hover {
+            background: var(--ans-color);
+            color: #ffffff;
+        }
+
+        .btn-split {
+            color: var(--split-color);
+            border-color: var(--border-dark);
+            background: var(--surface-sub);
+        }
+        .btn-split:hover {
+            background: var(--text-main);
+            color: var(--surface);
+        }
+
+        .btn-download {
+            color: var(--admin-color);
+            border-color: var(--admin-color);
+            background: var(--surface);
+            display: none;
+        }
+        .btn-download:hover {
+            background: var(--admin-color);
+            color: #ffffff;
+        }
+
+        /* 管理者モード時のダウンロードボタン解放 */
+        body.is-admin .btn-download {
+            display: inline-block;
+        }
+
+        /* ── PDFプレビューモーダル（単体・分割兼用） ── */
+        .viewer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            padding: 12px;
+        }
+
+        .viewer-modal.open {
+            display: flex;
+        }
+
+        .viewer-header {
+            background: var(--surface);
+            border: 1px solid var(--border-dark);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+
+        .viewer-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.04em;
+        }
+
+        .viewer-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .viewer-body {
+            flex: 1;
+            display: grid;
+            gap: 8px;
+            min-height: 0;
+        }
+
+        /* 分割モード（2画面） */
+        .viewer-body.split-mode {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        /* 単体モード（1画面全幅） */
+        .viewer-body.single-mode {
+            grid-template-columns: 1fr;
+        }
+
+        @media (max-width: 768px) {
+            .viewer-body.split-mode {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+        }
+
+        .pane-wrap {
+            background: #fff;
+            border: 1px solid var(--border-dark);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pane-header {
+            background: var(--surface-sub);
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .pane-wrap iframe {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* ── 日付設定モーダル ── */
+        .dialog-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            place-items: center;
+            z-index: 100;
+        }
+
+        .dialog-backdrop.open {
+            display: grid;
+        }
+
+        .dialog-box {
+            background: var(--surface);
+            border: 1px solid var(--text-main);
+            padding: 24px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .dialog-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+        }
+
+        .dialog-box input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-dark);
+            font-family: var(--font-mono);
+            margin-bottom: 16px;
+            background: var(--bg);
+            color: var(--text-main);
+        }
+
+        .no-records {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            border: 1px dashed var(--border);
+            display: none;
+        }
+    </style>
+</head>
+<body class="protect-mode">
+
+<!-- 認証ゲート（ロック画面） -->
+<div class="auth-overlay" id="authScreen">
+    <div class="auth-card">
+        <div class="auth-badge">PROTECTED ARCHIVE</div>
+        <h2>定期考査 過去問題録</h2>
+        <p>暗号化保護領域：パスワードを入力してください</p>
+        <form id="authForm" onsubmit="return false;">
+            <input type="password" id="passwordInput" class="auth-input" placeholder="暗証番号を入力" autofocus autocomplete="current-password">
+            <button type="submit" id="authSubmitBtn" class="auth-btn">入場する</button>
+            <div id="authError" class="auth-error">※ 暗証番号が一致しません</div>
+        </form>
+    </div>
+</div>
+
+<!-- メインコンテンツ -->
+<div class="container" id="mainContainer">
+    <header>
+        <div class="header-meta">
+            <span>PERIODICAL EXAMINATION ARCHIVE</span>
+            <div>
+                <span>第 <strong id="visitorCount" class="counter-badge">---</strong> 人目の閲覧者</span>
+                <span style="margin-left: 12px;" id="currentDateDisplay">----.--.--</span>
+            </div>
+        </div>
+        <div class="header-title-wrap">
+            <div>
+                <h1>定期考査 過去問題録 <span id="roleBadge" class="role-tag">一般閲覧</span></h1>
+            </div>
+            <div class="header-tools">
+                <div class="countdown-chip" id="setDateBtn" title="クリックして試験日を設定">
+                    <span>次回考査まで</span>
+                    <strong id="daysRemain">--</strong>
+                    <span>日</span>
+                </div>
+                <button class="btn-theme" id="themeBtn">反転 (白/黒)</button>
+                <button class="btn-theme" id="lockBtn">施錠</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 最近閲覧した問題 (履歴バー) -->
+    <div class="recent-bar" id="recentBar" style="display: none;">
+        <span class="recent-label">最近の閲覧:</span>
+        <div class="recent-items" id="recentItems"></div>
+    </div>
+
+    <!-- 検索・抽出パネル -->
+    <div class="filter-panel">
+        <div class="filter-main-row">
+            <div>
+                <select id="yearSelect" class="filter-select">
+                    <option value="all">すべての年度</option>
+                    <option value="2025" selected>2025年度</option>
+                </select>
+            </div>
+            <div>
+                <select id="gradeSelect" class="filter-select">
+                    <option value="all">すべての学年</option>
+                    <option value="1" selected>第1学年</option>
+                    <option value="2">第2学年</option>
+                    <option value="3">第3学年</option>
+                </select>
+            </div>
+            <div class="search-input-wrap">
+                <input type="text" id="searchInput" class="search-input" placeholder="科目名称で検索 (例: 数学Ⅰ, 物理基礎, 保健, 家庭...)">
+            </div>
+        </div>
+
+        <div class="filter-sub-row">
+            <div class="filter-group">
+                <span class="filter-group-label">考査:</span>
+                <button class="filter-chip active" data-term="all">全考査</button>
+                <button class="filter-chip" data-term="前期期末">前期期末</button>
+                <button class="filter-chip" data-term="前期中間">前期中間</button>
+                <button class="filter-chip" data-term="後期中間">後期中間</button>
+                <button class="filter-chip" data-term="後期末">後期末</button>
+            </div>
+            <div class="filter-group" id="categoryTabs">
+                <span class="filter-group-label">教科:</span>
+                <button class="filter-chip active" data-cat="all">全教科</button>
+                <button class="filter-chip" data-cat="math">数学</button>
+                <button class="filter-chip" data-cat="japanese">国語</button>
+                <button class="filter-chip" data-cat="english">外国語</button>
+                <button class="filter-chip" data-cat="science">理科</button>
+                <button class="filter-chip" data-cat="social">地歴</button>
+                <button class="filter-chip" data-cat="sub">実技・家庭</button>
+            </div>
+        </div>
+
+        <div class="panel-footer">
+            <span id="filteredCount">全 44 項目</span>
+            <div>
+                <span class="action-link" id="expandAll">すべて展開</span>
+                <span class="action-link" id="collapseAll">すべて閉じる</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 過去問リスト構造 -->
+    <div id="archiveRoot"></div>
+    <div class="no-records" id="noRecords">該当する過去問記録が存在しません。</div>
+</div>
+
+<!-- PDFプレビューモーダル -->
+<div class="viewer-modal" id="viewerModal">
+    <div class="viewer-header">
+        <div class="viewer-title" id="viewerSubjectTitle">過去問プレビュー</div>
+        <div class="viewer-actions">
+            <button class="btn-theme" id="closeViewerBtn">✕ 閉じる (Esc)</button>
+        </div>
+    </div>
+    <div class="viewer-body" id="viewerBody">
+        <div class="pane-wrap" id="paneQuestion">
+            <div class="pane-header">
+                <span id="labelQuestion">[問題]</span>
+                <span style="font-size:0.7rem; color:var(--text-sub);">※ 閲覧専用保護中</span>
+            </div>
+            <iframe id="frameQuestion" src=""></iframe>
+        </div>
+        <div class="pane-wrap" id="paneAnswer">
+            <div class="pane-header">
+                <span id="labelAnswer">[模範解答]</span>
+                <span style="font-size:0.7rem; color:var(--text-sub);">※ 閲覧専用保護中</span>
+            </div>
+            <iframe id="frameAnswer" src=""></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- 日付設定ダイアログ -->
+<div class="dialog-backdrop" id="dateDialog">
+    <div class="dialog-box">
+        <h3>次回考査 期日設定</h3>
+        <input type="date" id="dateField">
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button class="btn-theme" id="cancelDateBtn">取消</button>
+            <button class="btn-theme" id="saveDateBtn" style="border-color: var(--accent); color: var(--accent);">設定</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* ═══════════════════════════════════════════════════════════════════
+       🔒 セキュリティ & マスターデータ
+       一般パスワード: password123 (閲覧のみ)
+       管理者パスワード: password234 (全機能・ダウンロード解放)
+       ═══════════════════════════════════════════════════════════════════ */
+    const RAW_MASTER_DATA = [
+        {
+            id: "2025_g1_term1_fin",
+            year: "2025",
+            grade: "1",
+            term: "前期期末",
+            name: "2025年度 第1学年 前期期末考査",
+            items: [
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_1_数1_問.pdf", aFile: "2025_1_1_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_1_数A_問.pdf", aFile: "2025_1_1_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_1_現国_問.pdf", aFile: "2025_1_1_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_1_言文_問.pdf", aFile: "2025_1_1_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_1_EC_問.pdf", aFile: "2025_1_1_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_1_LE_問.pdf", aFile: "2025_1_1_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_1_物基_問.pdf", aFile: "2025_1_1_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_1_生基_問.pdf", aFile: "2025_1_1_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_1_地総_問.pdf", aFile: "2025_1_1_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_1_歴総_問.pdf", aFile: "2025_1_1_歴総_解.pdf" },
+                { name: "保健", cat: "sub", tag: "保体", qFile: "2025_1_1_保健_問.pdf", aFile: "2025_1_1_保健_解.pdf" },
+                { name: "家庭", cat: "sub", tag: "家庭", qFile: "2025_1_1_家庭_問.pdf", aFile: "2025_1_1_家庭_解.pdf" }
+            ]
+        },
+        {
+            id: "2025_g1_term1_mid",
+            year: "2025",
+            grade: "1",
+            term: "前期中間",
+            name: "2025年度 第1学年 前期中間考査",
+            items: [
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_2_数1_問.pdf", aFile: "2025_1_2_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_2_数A_問.pdf", aFile: "2025_1_2_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_2_現国_問.pdf", aFile: "2025_1_2_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_2_言文_問.pdf", aFile: "2025_1_2_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_2_EC_問.pdf", aFile: "2025_1_2_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_2_LE_問.pdf", aFile: "2025_1_2_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_2_物基_問.pdf", aFile: "2025_1_2_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_2_生基_問.pdf", aFile: "2025_1_2_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_2_地総_問.pdf", aFile: "2025_1_2_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_2_歴総_問.pdf", aFile: "2025_1_2_歴総_解.pdf" }
+            ]
+        },
+        {
+            id: "2025_g1_term2_mid",
+            year: "2025",
+            grade: "1",
+            term: "後期中間",
+            name: "2025年度 第1学年 後期中間考査",
+            items: [
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_3_数1_問.pdf", aFile: "2025_1_3_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_3_数A_問.pdf", aFile: "2025_1_3_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_3_現国_問.pdf", aFile: "2025_1_3_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_3_言文_問.pdf", aFile: "2025_1_3_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_3_EC_問.pdf", aFile: "2025_1_3_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_3_LE_問.pdf", aFile: "2025_1_3_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_3_物基_問.pdf", aFile: "2025_1_3_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_3_生基_問.pdf", aFile: "2025_1_3_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_3_地総_問.pdf", aFile: "2025_1_3_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_3_歴総_問.pdf", aFile: "2025_1_3_歴総_解.pdf" }
+            ]
+        },
+        {
+            id: "2025_g1_term2_fin",
+            year: "2025",
+            grade: "1",
+            term: "後期末",
+            name: "2025年度 第1学年 後期末考査",
+            items: [
+                { name: "数学Ⅰ", cat: "math", tag: "数学", qFile: "2025_1_4_数1_問.pdf", aFile: "2025_1_4_数1_解.pdf" },
+                { name: "数学A", cat: "math", tag: "数学", qFile: "2025_1_4_数A_問.pdf", aFile: "2025_1_4_数A_解.pdf" },
+                { name: "現代の国語", cat: "japanese", tag: "国語", qFile: "2025_1_4_現国_問.pdf", aFile: "2025_1_4_現国_解.pdf" },
+                { name: "言語文化", cat: "japanese", tag: "国語", qFile: "2025_1_4_言文_問.pdf", aFile: "2025_1_4_言文_解.pdf" },
+                { name: "英語EC", cat: "english", tag: "外国語", qFile: "2025_1_4_EC_問.pdf", aFile: "2025_1_4_EC_解.pdf" },
+                { name: "英語LE", cat: "english", tag: "外国語", qFile: "2025_1_4_LE_問.pdf", aFile: "2025_1_4_LE_解.pdf" },
+                { name: "物理基礎", cat: "science", tag: "理科", qFile: "2025_1_4_物基_問.pdf", aFile: "2025_1_4_物基_解.pdf" },
+                { name: "生物基礎", cat: "science", tag: "理科", qFile: "2025_1_4_生基_問.pdf", aFile: "2025_1_4_生基_解.pdf" },
+                { name: "地理総合", cat: "social", tag: "地歴", qFile: "2025_1_4_地総_問.pdf", aFile: "2025_1_4_地総_解.pdf" },
+                { name: "歴史総合", cat: "social", tag: "地歴", qFile: "2025_1_4_歴総_問.pdf", aFile: "2025_1_4_歴総_解.pdf" },
+                { name: "保健", cat: "sub", tag: "保体", qFile: "2025_1_4_保健_問.pdf", aFile: "2025_1_4_保健_解.pdf" },
+                { name: "家庭", cat: "sub", tag: "家庭", qFile: "2025_1_4_家庭_問.pdf", aFile: "2025_1_4_家庭_解.pdf" }
+            ]
+        }
+    ];
+
+    let archiveData = [];
+    let currentUserRole = "viewer";
+
+    async function sha256(str) {
+        const buf = new TextEncoder().encode(str);
+        const dig = await crypto.subtle.digest("SHA-256", buf);
+        return Array.from(new Uint8Array(dig)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    /* ── 防御設定（右クリック・保存防止） ── */
+    document.addEventListener("contextmenu", (e) => {
+        if (currentUserRole !== "admin") e.preventDefault();
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (currentUserRole === "admin") return;
+        if ((e.ctrlKey || e.metaKey) && ["s", "p", "u"].includes(e.key.toLowerCase())) {
+            e.preventDefault();
+        }
+    });
+
+    /* ── 認証処理 ── */
+    async function attemptAuth(password) {
+        const inputHash = await sha256(password);
+        const err = document.getElementById("authError");
+
+        const adminHash = await sha256(atob("cGFzc3dvcmQyMzQ=")); // password234
+        const viewerHash = await sha256(atob("cGFzc3dvcmQxMjM=")); // password123
+
+        if (inputHash === adminHash) {
+            currentUserRole = "admin";
+            grantAccess();
+            return;
+        }
+
+        if (inputHash === viewerHash) {
+            currentUserRole = "viewer";
+            grantAccess();
+            return;
+        }
+
+        err.style.display = "block";
+        document.getElementById("passwordInput").value = "";
+    }
+
+    function grantAccess() {
+        archiveData = RAW_MASTER_DATA;
+        sessionStorage.setItem("exam_auth_role", currentUserRole);
+
+        if (currentUserRole === "admin") {
+            document.body.classList.add("is-admin");
+            document.body.classList.remove("protect-mode");
+            const badge = document.getElementById("roleBadge");
+            badge.textContent = "管理者権限 (全機能解放)";
+            badge.className = "role-tag role-admin";
+        }
+
+        document.getElementById("authScreen").style.display = "none";
+        document.getElementById("mainContainer").style.display = "block";
+
+        fetchVisitorCount();
+        loadState();
+        renderArchive();
+    }
+
+    document.getElementById("authSubmitBtn").addEventListener("click", () => {
+        attemptAuth(document.getElementById("passwordInput").value);
+    });
+    document.getElementById("authForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        attemptAuth(document.getElementById("passwordInput").value);
+    });
+
+    document.getElementById("lockBtn").addEventListener("click", () => {
+        sessionStorage.removeItem("exam_auth_role");
+        location.reload();
+    });
+
+    /* ── アクセスカウンター ── */
+    async function fetchVisitorCount() {
+        const display = document.getElementById("visitorCount");
+        try {
+            const res = await fetch("https://api.counterapi.dev/v1/exam_archive_portal_2025/visits/up");
+            const data = await res.json();
+            display.textContent = data.count.toLocaleString();
+        } catch (e) {
+            let count = parseInt(localStorage.getItem("local_visit_count") || "128");
+            count++;
+            localStorage.setItem("local_visit_count", count.toString());
+            display.textContent = count.toLocaleString();
+        }
+    }
+
+    /* ── アーカイブ描画 ── */
+    const STORAGE_KEY = "exam_portal_store";
+    let state = {
+        targetDate: "",
+        theme: "light",
+        recent: []
+    };
+
+    function loadState() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+            try { state = Object.assign(state, JSON.parse(raw)); } catch(e){}
+        }
+        if (state.theme === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+        }
+        renderRecent();
+        updateCountdown();
+    }
+
+    function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function addRecent(title, qFile, aFile) {
+        state.recent = state.recent.filter(r => r.qFile !== qFile);
+        state.recent.unshift({ title, qFile, aFile });
+        if (state.recent.length > 3) state.recent.pop();
+        saveState();
+        renderRecent();
+    }
+
+    function renderRecent() {
+        const bar = document.getElementById("recentBar");
+        const list = document.getElementById("recentItems");
+        if (!state.recent || state.recent.length === 0) {
+            bar.style.display = "none";
+            return;
+        }
+        bar.style.display = "flex";
+        list.innerHTML = state.recent.map(r => `
+            <div class="recent-chip" onclick="openSplitViewer('${r.title}', '${r.qFile}', '${r.aFile}')">
+                <span>[2画面]</span> ${r.title}
+            </div>
+        `).join("");
+    }
+
+    let selectedYear = "2025";
+    let selectedGrade = "1";
+    let selectedTerm = "all";
+    let selectedCat = "all";
+    let searchKeyword = "";
+
+    function renderArchive() {
+        const root = document.getElementById("archiveRoot");
+        root.innerHTML = "";
+
+        let matchCount = 0;
+
+        archiveData.forEach((section, idx) => {
+            if (selectedYear !== "all" && section.year !== selectedYear) return;
+            if (selectedGrade !== "all" && section.grade !== selectedGrade) return;
+            if (selectedTerm !== "all" && section.term !== selectedTerm) return;
+
+            const matchedItems = section.items.filter(item => {
+                const matchQuery = item.name.includes(searchKeyword);
+                const matchCat = (selectedCat === "all") || (item.cat === selectedCat);
+                return matchQuery && matchCat;
+            });
+
+            if (matchedItems.length === 0) return;
+            matchCount += matchedItems.length;
+
+            const details = document.createElement("details");
+            details.className = "exam-section";
+            if (idx === 0 || selectedTerm !== "all") details.open = true;
+
+            const summary = document.createElement("summary");
+            summary.innerHTML = `
+                <div class="section-title">
+                    <span>${section.name}</span>
+                    <span class="section-count">[ ${matchedItems.length} 項目 ]</span>
+                </div>
+                <span class="toggle-icon">開閉 ＋/－</span>
+            `;
+            details.appendChild(summary);
+
+            const table = document.createElement("div");
+            table.className = "file-table";
+
+            matchedItems.forEach(item => {
+                const row = document.createElement("div");
+                row.className = "file-row";
+                row.innerHTML = `
+                    <div class="row-left">
+                        <span class="subj-tag">${item.tag}</span>
+                        <span class="subj-title">${item.name}</span>
+                    </div>
+                    <div class="row-right">
+                        <button class="view-btn btn-split" onclick="openSplitViewer('${section.name}・${item.name}', '${item.qFile}', '${item.aFile}')">並べて表示</button>
+                        <button class="view-btn btn-question" onclick="openSingleViewer('${section.name}・${item.name} [問題]', '${item.qFile}', '問題')">問題</button>
+                        <button class="view-btn btn-answer" onclick="openSingleViewer('${section.name}・${item.name} [解答]', '${item.aFile}', '模範解答')">解答</button>
+                        <a href="${item.qFile}" download class="view-btn btn-download" title="管理者専用ダウンロード">DL問</a>
+                        <a href="${item.aFile}" download class="view-btn btn-download" title="管理者専用ダウンロード">DL解</a>
+                    </div>
+                `;
+                table.appendChild(row);
+            });
+
+            details.appendChild(table);
+            root.appendChild(details);
+        });
+
+        document.getElementById("filteredCount").textContent = `表示中: ${matchCount} 項目`;
+        document.getElementById("noRecords").style.display = matchCount === 0 ? "block" : "none";
+    }
+
+    /* ── 単体ビューアー（1画面全幅表示） ── */
+    window.openSingleViewer = function(title, file, label) {
+        document.getElementById("viewerSubjectTitle").textContent = title;
+        const body = document.getElementById("viewerBody");
+        body.className = "viewer-body single-mode";
+
+        document.getElementById("paneAnswer").style.display = "none";
+        document.getElementById("paneQuestion").style.display = "flex";
+
+        document.getElementById("labelQuestion").textContent = `[${label}]`;
+        document.getElementById("frameQuestion").src = file + "#toolbar=0&navpanes=0";
+        document.getElementById("frameAnswer").src = "";
+
+        document.getElementById("viewerModal").classList.add("open");
+    };
+
+    /* ── 分割ビューアー（2画面並列表示） ── */
+    window.openSplitViewer = function(title, qFile, aFile) {
+        document.getElementById("viewerSubjectTitle").textContent = title;
+        const body = document.getElementById("viewerBody");
+        body.className = "viewer-body split-mode";
+
+        document.getElementById("paneQuestion").style.display = "flex";
+        document.getElementById("paneAnswer").style.display = "flex";
+
+        document.getElementById("labelQuestion").textContent = "[問題]";
+        document.getElementById("labelAnswer").textContent = "[模範解答]";
+
+        document.getElementById("frameQuestion").src = qFile + "#toolbar=0&navpanes=0";
+        document.getElementById("frameAnswer").src = aFile + "#toolbar=0&navpanes=0";
+
+        document.getElementById("viewerModal").classList.add("open");
+        addRecent(title, qFile, aFile);
+    };
+
+    function closeViewer() {
+        document.getElementById("viewerModal").classList.remove("open");
+        document.getElementById("frameQuestion").src = "";
+        document.getElementById("frameAnswer").src = "";
+    }
+
+    document.getElementById("closeViewerBtn").addEventListener("click", closeViewer);
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeViewer();
+    });
+
+    /* ── カウントダウン & フィルタ操作 ── */
+    function updateCountdown() {
+        if (!state.targetDate) {
+            document.getElementById("daysRemain").textContent = "--";
+            return;
+        }
+        const target = new Date(state.targetDate + "T00:00:00");
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+        document.getElementById("daysRemain").textContent = diff >= 0 ? diff : "終了";
+    }
+
+    document.getElementById("yearSelect").addEventListener("change", (e) => {
+        selectedYear = e.target.value;
+        renderArchive();
+    });
+    document.getElementById("gradeSelect").addEventListener("change", (e) => {
+        selectedGrade = e.target.value;
+        renderArchive();
+    });
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+        searchKeyword = e.target.value.trim();
+        renderArchive();
+    });
+
+    document.querySelectorAll("[data-term]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll("[data-term]").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedTerm = btn.dataset.term;
+            renderArchive();
+        });
+    });
+
+    document.querySelectorAll("[data-cat]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll("[data-cat]").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedCat = btn.dataset.cat;
+            renderArchive();
+        });
+    });
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+        document.querySelectorAll(".exam-section").forEach(s => s.open = true);
+    });
+    document.getElementById("collapseAll").addEventListener("click", () => {
+        document.querySelectorAll(".exam-section").forEach(s => s.open = false);
+    });
+
+    document.getElementById("themeBtn").addEventListener("click", () => {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        const next = isDark ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        state.theme = next;
+        saveState();
+    });
+
+    const dialog = document.getElementById("dateDialog");
+    const dateField = document.getElementById("dateField");
+    document.getElementById("setDateBtn").addEventListener("click", () => {
+        dateField.value = state.targetDate || "";
+        dialog.classList.add("open");
+    });
+    document.getElementById("cancelDateBtn").addEventListener("click", () => {
+        dialog.classList.remove("open");
+    });
+    document.getElementById("saveDateBtn").addEventListener("click", () => {
+        state.targetDate = dateField.value;
+        saveState();
+        updateCountdown();
+        dialog.classList.remove("open");
+    });
+
+    const now = new Date();
+    document.getElementById("currentDateDisplay").textContent = 
+        `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+
+    (function checkSession() {
+        const savedRole = sessionStorage.getItem("exam_auth_role");
+        if (savedRole === "admin" || savedRole === "viewer") {
+            currentUserRole = savedRole;
+            grantAccess();
+        }
+    })();
+</script>
+
+</body>
+</html>            --text-main: #eae8e1;
             --text-sub: #9ca3af;
             --accent: #60a5fa;
             --ans-color: #34d399;
