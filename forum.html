@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学年掲示板 | FORUM & BULLETIN</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Noto+Serif+JP:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+  <style>
+    body { font-family: 'Noto Serif JP', serif; }
+    .font-serif-en { font-family: 'Cormorant Garamond', serif; }
+    .font-number { font-family: 'Cinzel', 'Space Mono', serif; }
+    .emblem-frame {
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      outline: 1px solid rgba(255, 255, 255, 0.15);
+      outline-offset: 2px;
+    }
+    .liked-active {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      border-color: #ffffff !important;
+    }
+  </style>
+</head>
+<body class="bg-[#111111] text-neutral-100 antialiased min-h-screen selection:bg-white selection:text-black">
+
+  <!-- 固定ヘッダー -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/90 backdrop-blur border-b border-white/10">
+    <div class="max-w-4xl mx-auto px-6 h-16 flex justify-between items-center">
+      
+      <!-- 親ポータルに戻る -->
+      <a href="./index.html" class="group flex items-center gap-3 text-white">
+        <div class="emblem-frame w-9 h-9 bg-white p-1 flex items-center justify-center transition duration-300 group-hover:scale-105 group-hover:outline-white">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" class="w-full h-full drop-shadow-sm">
+            <path fill="#000000" d="M250,22 L258,62 L276,68 L296,125 C335,102 385,100 416,128 C448,158 442,202 398,222 C458,235 492,282 476,340 C458,390 392,402 332,375 C345,410 365,445 382,478 C340,460 295,442 250,442 C205,442 160,460 118,478 C135,445 155,410 168,375 C108,402 42,390 24,340 C8,282 42,235 102,222 C58,202 52,158 84,128 C115,100 165,102 204,125 L224,68 L242,62 Z" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-[10px] font-mono tracking-widest text-neutral-400 group-hover:text-white transition">&larr; BACK TO PORTAL</span>
+          <span class="text-xs font-bold tracking-wider text-white">学年ポータル</span>
+        </div>
+      </a>
+
+      <!-- 右上ステータス（管理者モード時はADMIN表示） -->
+      <div class="flex items-center gap-3">
+        <div id="adminBadge" class="hidden border border-red-500 bg-red-950/60 text-red-300 px-2.5 py-1 text-[10px] font-mono font-bold">
+          ADMIN MODE
+        </div>
+        <div class="flex items-center gap-2 text-xs font-mono text-neutral-400">
+          <span id="syncDot" class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+          <span id="syncText" class="tracking-widest uppercase">REALTIME LIVE</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- メインコンテンツ -->
+  <main class="max-w-4xl mx-auto px-6 pt-32 pb-28 space-y-16">
+
+    <div class="border-b border-white/20 pb-8 space-y-3">
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-mono tracking-[0.3em] text-neutral-400 uppercase">[MODULE 02]</span>
+        <span class="text-xs font-mono text-neutral-500">|</span>
+        <span class="text-xs font-mono text-neutral-400 uppercase">Interactive Forum</span>
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-bold font-serif-en tracking-wider text-white">
+        FORUM & BULLETIN
+      </h1>
+      <p class="text-xs sm:text-sm text-neutral-400 font-light leading-relaxed">
+        勉強の質問、テスト範囲の共有、連絡事項の学年専用リアルタイム掲示板。
+      </p>
+    </div>
+
+    <!-- 連投規制アラート枠 -->
+    <div id="banAlert" class="hidden border-2 border-red-500 bg-red-950/50 p-4 text-xs font-mono text-red-200">
+      <div class="flex items-center gap-2 font-bold mb-1">
+        <span>[!] RATE LIMIT ACTIVATED (連投規制)</span>
+      </div>
+      <p>短時間の連続投稿が検知されたため一時的に制限されています。解除まであと <span id="banTimer" class="font-bold text-white text-sm">--:--</span></p>
+    </div>
+
+    <!-- ① カテゴリフィルタータブ（「その他」追加済） -->
+    <div class="flex flex-wrap gap-2 border-b border-white/10 pb-4 text-xs font-mono">
+      <button onclick="filterCategory('ALL')" class="cat-btn active border border-white bg-white text-black px-4 py-2 font-bold transition">ALL TOPICS</button>
+      <button onclick="filterCategory('質問・勉強')" class="cat-btn border border-white/20 bg-neutral-950 text-neutral-400 px-4 py-2 hover:border-white transition">質問・勉強</button>
+      <button onclick="filterCategory('テスト対策')" class="cat-btn border border-white/20 bg-neutral-950 text-neutral-400 px-4 py-2 hover:border-white transition">テスト対策</button>
+      <button onclick="filterCategory('連絡・雑談')" class="cat-btn border border-white/20 bg-neutral-950 text-neutral-400 px-4 py-2 hover:border-white transition">連絡・雑談</button>
+      <button onclick="filterCategory('その他')" class="cat-btn border border-white/20 bg-neutral-950 text-neutral-400 px-4 py-2 hover:border-white transition">その他</button>
+    </div>
+
+
+    <!-- ② 投稿スレッド一覧 -->
+    <section class="space-y-4">
+      <div class="flex justify-between items-center text-xs font-mono text-neutral-500 mb-2">
+        <span id="postCount">POSTS : --</span>
+        <span class="text-[11px]">AUTO-SYNCED</span>
+      </div>
+
+      <div id="postsList" class="space-y-6">
+        <!-- 投稿がここに動的表示されます -->
+      </div>
+    </section>
+
+
+    <!-- ③ 新規親スレッド投稿フォーム -->
+    <section id="postFormSection" class="border-2 border-white/30 bg-neutral-950 p-8 sm:p-10 space-y-6">
+      <div class="border-b border-white/10 pb-4">
+        <span class="text-[10px] font-mono tracking-widest text-amber-400 uppercase block mb-1">New Thread</span>
+        <h2 class="text-xl font-bold font-serif text-white">新しいスレッドを作成する</h2>
+      </div>
+
+      <form onsubmit="handleNewPost(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-neutral-400 font-mono mb-1.5 uppercase tracking-wider">NAME (ニックネーム / 匿名可)</label>
+            <input type="text" id="postAuthor" placeholder="名無しさん" class="w-full bg-neutral-900 border border-neutral-700 text-white px-3.5 py-2.5 outline-none focus:border-white font-mono">
+          </div>
+
+          <div>
+            <label class="block text-neutral-400 font-mono mb-1.5 uppercase tracking-wider">CATEGORY *</label>
+            <select id="postCategory" required class="w-full bg-neutral-900 border border-neutral-700 text-white px-3.5 py-2.5 outline-none focus:border-white">
+              <option value="質問・勉強">質問・勉強</option>
+              <option value="テスト対策">テスト対策</option>
+              <option value="連絡・雑談">連絡・雑談</option>
+              <option value="その他">その他</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-neutral-400 font-mono mb-1.5 uppercase tracking-wider">MESSAGE *</label>
+          <textarea id="postContent" rows="4" placeholder="質問や共有したい情報を入力してください..." required class="w-full bg-neutral-900 border border-neutral-700 text-white p-3.5 outline-none focus:border-white leading-relaxed"></textarea>
+        </div>
+
+        <div class="pt-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <span class="text-[11px] text-neutral-500 font-serif">※ 1分間に6回以上の連続投稿は自動的に規制されます。</span>
+          <button type="submit" id="submitPostBtn" class="border border-white bg-white text-black px-8 py-3 font-bold font-mono tracking-wider hover:bg-transparent hover:text-white transition duration-200">
+            POST THREAD &rarr;
+          </button>
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+
+  <!-- 通報モーダル -->
+  <div id="reportModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-neutral-950 border border-white/30 max-w-md w-full p-8 relative space-y-5 shadow-2xl">
+      <button onclick="closeReportModal()" class="absolute top-4 right-4 text-neutral-400 hover:text-white font-mono text-xl">&times;</button>
+      
+      <div>
+        <span class="text-[10px] font-mono tracking-widest text-red-400 uppercase block mb-1">Report System</span>
+        <h3 class="text-lg font-bold font-serif text-white">不適切な投稿の報告</h3>
+      </div>
+
+      <p class="text-xs text-neutral-400 font-light leading-relaxed">
+        報告内容は管理者に直接送信され、確認後に対処されます。
+      </p>
+
+      <form onsubmit="submitReport(event)" class="space-y-4 text-xs font-mono">
+        <input type="hidden" id="reportTargetPostId">
+        <input type="hidden" id="reportTargetContent">
+
+        <div>
+          <label class="block text-neutral-400 mb-1.5 uppercase">REASON (報告理由) *</label>
+          <select id="reportReason" required class="w-full bg-neutral-900 border border-neutral-700 text-white p-2.5 outline-none focus:border-white font-serif">
+            <option value="誹謗中傷・嫌がらせ">誹謗中傷・嫌がらせ</option>
+            <option value="個人情報の掲載">個人情報の掲載</option>
+            <option value="荒らし・スパム連投">荒らし・スパム連投</option>
+            <option value="その他不適切な内容">その他不適切な内容</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-neutral-400 mb-1.5 uppercase">DETAILS (詳細・任意)</label>
+          <textarea id="reportDetails" rows="2" placeholder="具体的な問題点があれば記入..." class="w-full bg-neutral-900 border border-neutral-700 text-white p-2.5 outline-none focus:border-white font-serif"></textarea>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-3">
+          <button type="button" onclick="closeReportModal()" class="px-4 py-2 text-neutral-400 hover:text-white">CANCEL</button>
+          <button type="submit" class="border border-red-500 bg-red-600 text-white px-5 py-2 font-bold hover:bg-red-700 transition">SUBMIT REPORT</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- フッター -->
+  <footer class="border-t border-white/10 bg-black mt-20">
+    <div class="max-w-4xl mx-auto px-6 py-12 flex flex-col sm:flex-row justify-between items-center gap-6 text-xs text-neutral-500 font-mono">
+      <div class="flex items-center gap-3.5">
+        <div class="emblem-frame w-6 h-6 bg-white p-0.5 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" class="w-full h-full">
+            <path fill="#000000" d="M250,22 L258,62 L276,68 L296,125 C335,102 385,100 416,128 C448,158 442,202 398,222 C458,235 492,282 476,340 C458,390 392,402 332,375 C345,410 365,445 382,478 C340,460 295,442 250,442 C205,442 160,460 118,478 C135,445 155,410 168,375 C108,402 42,390 24,340 C8,282 42,235 102,222 C58,202 52,158 84,128 C115,100 165,102 204,125 L224,68 L242,62 Z" />
+          </svg>
+        </div>
+        <span>2026 FORUM & BULLETIN</span>
+      </div>
+      <a href="./index.html" class="hover:text-white transition">&larr; BACK TO MAIN PORTAL</a>
+    </div>
+  </footer>
+
+  <script>
+    // ★★★ Firebase設定（ご自身のキーを貼り付けてください） ★★★
+    const firebaseConfig = {
+      apiKey: "AIzaSy...",
+      authDomain: "school-8c899.firebaseapp.com",
+      databaseURL: "https://school-8c899-default-rtdb.firebaseio.com",
+      projectId: "school-8c899",
+      storageBucket: "school-8c899.appspot.com",
+      messagingSenderId: "...",
+      appId: "..."
+    };
+
+    let isFirebaseActive = false;
+    let db = null;
+
+    if (firebaseConfig.databaseURL && firebaseConfig.apiKey && firebaseConfig.apiKey !== "AIzaSy...") {
+      try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        isFirebaseActive = true;
+      } catch (e) {
+        console.warn("Firebase init error", e);
+      }
+    }
+
+    // ★★★ 管理者モード判定（index.htmlで sauna114515 を入れた場合のみtrue） ★★★
+    const isAdmin = localStorage.getItem("portal_admin_mode") === "true";
+    if (isAdmin) {
+      document.getElementById("adminBadge").classList.remove("hidden");
+    }
+
+    let localPosts = {};
+    let currentCategory = "ALL";
+    let activeReplyPostId = null;
+    let likedPostIds = JSON.parse(localStorage.getItem("portal_liked_posts")) || {};
+
+    function startListener() {
+      if (isFirebaseActive && db) {
+        db.ref("posts").on("value", snapshot => {
+          localPosts = snapshot.val() || {};
+          renderPosts();
+        });
+      } else {
+        localPosts = JSON.parse(localStorage.getItem("portal_forum_realtime")) || {};
+        renderPosts();
+      }
+    }
+
+    function renderPosts() {
+      const list = document.getElementById("postsList");
+      const postArray = Object.values(localPosts).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+      const filtered = currentCategory === "ALL" ? postArray : postArray.filter(p => p.category === currentCategory);
+
+      document.getElementById("postCount").innerText = `POSTS : ${filtered.length}`;
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="p-12 text-center text-xs font-mono text-neutral-500 border border-white/10 bg-neutral-950">NO THREADS FOUND</div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(post => {
+        const replies = post.replies ? Object.values(post.replies) : [];
+        const isReplyingThis = activeReplyPostId === post.id;
+        const isLiked = likedPostIds[post.id] === true;
+
+        return `
+          <article class="border border-white/15 bg-neutral-950 p-6 sm:p-7 space-y-5 hover:border-white/30 transition">
+            <div class="flex flex-wrap justify-between items-center gap-2 border-b border-white/10 pb-3 text-xs">
+              <div class="flex items-center gap-3">
+                <span class="text-[10px] font-mono border ${getCatBadge(post.category)} px-2 py-0.5 font-bold">${post.category}</span>
+                <span class="font-bold text-white font-mono">${escapeHtml(post.author)}</span>
+              </div>
+              
+              <div class="flex items-center gap-4 text-[11px] font-mono text-neutral-500">
+                <span>${post.date}</span>
+                <button onclick="openReportModal('${post.id}', '${escapeAttr(post.content)}')" class="hover:text-red-400 transition" title="この投稿を通報">⚑ 報告</button>
+                
+                <!-- ★ 管理者モード時のみ削除ボタンを描画 ★ -->
+                ${isAdmin ? `
+                  <button onclick="adminDeletePost('${post.id}')" class="text-red-400 hover:text-red-300 font-bold transition" title="管理者権限で削除">&times; 削除</button>
+                ` : ''}
+              </div>
+            </div>
+
+            <p class="text-sm text-neutral-200 leading-relaxed whitespace-pre-wrap font-light">${escapeHtml(post.content)}</p>
+
+            <div class="pt-2 flex justify-between items-center border-t border-white/10 text-xs font-mono">
+              <button onclick="toggleReplyForm('${post.id}')" class="text-neutral-400 hover:text-white transition flex items-center gap-1.5">
+                <span>&rdsh; REPLY</span>
+                <span class="text-[11px] text-neutral-500">(${replies.length})</span>
+              </button>
+              
+              <button onclick="toggleLike('${post.id}')" class="flex items-center gap-1.5 border border-white/20 px-3 py-1 text-xs font-mono transition ${isLiked ? 'liked-active' : 'bg-neutral-900 text-neutral-300 hover:border-white'}">
+                <span>&hearts; GOOD</span>
+                <span class="font-number font-bold">${post.likes || 0}</span>
+              </button>
+            </div>
+
+            <!-- 返信ツリー -->
+            ${replies.length > 0 ? `
+              <div class="mt-4 pt-4 border-l-2 border-white/20 pl-4 sm:pl-6 space-y-3">
+                <span class="text-[10px] font-mono tracking-widest text-neutral-500 uppercase block">REPLIES (${replies.length})</span>
+                ${replies.map(r => `
+                  <div class="border border-white/10 bg-neutral-900/60 p-3.5 text-xs space-y-1.5 relative">
+                    <div class="flex justify-between items-baseline text-[11px] font-mono text-neutral-400">
+                      <span class="font-bold text-neutral-200">${escapeHtml(r.author)}</span>
+                      <div class="flex items-center gap-3">
+                        <span>${r.date}</span>
+                        <!-- 管理者モード時のみ返信削除ボタンを描画 -->
+                        ${isAdmin ? `
+                          <button onclick="adminDeleteReply('${post.id}', '${r.id}')" class="text-red-400 hover:text-red-300 font-bold transition" title="返信を削除">&times; 削除</button>
+                        ` : ''}
+                      </div>
+                    </div>
+                    <p class="text-neutral-300 leading-relaxed whitespace-pre-wrap font-light text-[13px]">${escapeHtml(r.content)}</p>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            <!-- 返信フォーム -->
+            ${isReplyingThis ? `
+              <div class="mt-4 pt-4 border-t border-dashed border-white/20">
+                <form onsubmit="handleNewReply(event, '${post.id}')" class="space-y-3 text-xs">
+                  <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-mono text-amber-400 uppercase">Write a Reply</span>
+                    <button type="button" onclick="toggleReplyForm(null)" class="text-neutral-400 hover:text-white font-mono">&times; CLOSE</button>
+                  </div>
+                  <input type="text" id="replyAuthor_${post.id}" placeholder="返信者名（匿名可）" class="w-full bg-neutral-900 border border-neutral-700 text-white px-3 py-2 outline-none focus:border-white font-mono">
+                  <textarea id="replyContent_${post.id}" rows="2" placeholder="返信メッセージを入力..." required class="w-full bg-neutral-900 border border-neutral-700 text-white p-3 outline-none focus:border-white leading-relaxed"></textarea>
+                  <div class="flex justify-end">
+                    <button type="submit" class="border border-white bg-white text-black px-5 py-2 font-bold font-mono hover:bg-transparent hover:text-white transition">
+                      SEND REPLY &rarr;
+                    </button>
+                  </div>
+                </form>
+              </div>
+            ` : ''}
+
+          </article>
+        `;
+      }).join('');
+    }
+
+    function getCatBadge(cat) {
+      if (cat === "質問・勉強") return "border-blue-400 text-blue-400";
+      if (cat === "テスト対策") return "border-amber-400 text-amber-400";
+      if (cat === "連絡・雑談") return "border-emerald-400 text-emerald-400";
+      return "border-neutral-400 text-neutral-400";
+    }
+
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll(".cat-btn").forEach(btn => {
+        btn.className = "cat-btn border border-white/20 bg-neutral-950 text-neutral-400 px-4 py-2 hover:border-white transition";
+      });
+      event.target.className = "cat-btn border border-white bg-white text-black px-4 py-2 font-bold transition";
+      renderPosts();
+    }
+
+    function toggleReplyForm(postId) {
+      activeReplyPostId = activeReplyPostId === postId ? null : postId;
+      renderPosts();
+    }
+
+    function checkRateLimit() {
+      const now = Date.now();
+      const banUntil = parseInt(localStorage.getItem("portal_ban_until") || "0");
+      if (now < banUntil) {
+        alert(`連投規制中です。解除まであと ${Math.ceil((banUntil - now)/1000)} 秒お待ちください。`);
+        return false;
+      }
+
+      let timestamps = JSON.parse(localStorage.getItem("portal_post_history") || "[]");
+      timestamps = timestamps.filter(t => now - t < 60000);
+
+      if (timestamps.length >= 5) {
+        const newBan = now + 5 * 60 * 1000;
+        localStorage.setItem("portal_ban_until", String(newBan));
+        localStorage.setItem("portal_post_history", "[]");
+        updateBanUI();
+        alert("短時間に連続投稿されたため、BOT対策として5分間の投稿制限がかかりました。");
+        return false;
+      }
+
+      timestamps.push(now);
+      localStorage.setItem("portal_post_history", JSON.stringify(timestamps));
+      return true;
+    }
+
+    function updateBanUI() {
+      const banUntil = parseInt(localStorage.getItem("portal_ban_until") || "0");
+      const alertBox = document.getElementById("banAlert");
+      const timerEl = document.getElementById("banTimer");
+      const now = Date.now();
+
+      if (now < banUntil) {
+        alertBox.classList.remove("hidden");
+        const remainSec = Math.ceil((banUntil - now) / 1000);
+        const m = String(Math.floor(remainSec / 60)).padStart(2, '0');
+        const s = String(remainSec % 60).padStart(2, '0');
+        timerEl.innerText = `${m}:${s}`;
+      } else {
+        alertBox.classList.add("hidden");
+      }
+    }
+    setInterval(updateBanUI, 1000);
+
+    function handleNewPost(e) {
+      e.preventDefault();
+      if (!checkRateLimit()) return;
+
+      const author = document.getElementById("postAuthor").value.trim() || "名無しさん";
+      const category = document.getElementById("postCategory").value;
+      const content = document.getElementById("postContent").value.trim();
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const newId = "post_" + Date.now();
+
+      const newPost = {
+        id: newId,
+        author,
+        category,
+        date: dateStr,
+        content,
+        likes: 0,
+        timestamp: Date.now(),
+        replies: {}
+      };
+
+      if (isFirebaseActive && db) {
+        db.ref("posts/" + newId).set(newPost);
+      } else {
+        localPosts[newId] = newPost;
+        localStorage.setItem("portal_forum_realtime", JSON.stringify(localPosts));
+        renderPosts();
+      }
+
+      document.getElementById("postContent").value = "";
+    }
+
+    function handleNewReply(e, postId) {
+      e.preventDefault();
+      if (!checkRateLimit()) return;
+
+      const authorInput = document.getElementById(`replyAuthor_${postId}`);
+      const contentInput = document.getElementById(`replyContent_${postId}`);
+      const author = authorInput ? authorInput.value.trim() || "名無しさん" : "名無しさん";
+      const content = contentInput ? contentInput.value.trim() : "";
+
+      if (!content) return;
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const replyId = "rep_" + Date.now();
+
+      const newReply = {
+        id: replyId,
+        author,
+        date: dateStr,
+        content
+      };
+
+      if (isFirebaseActive && db) {
+        db.ref(`posts/${postId}/replies/${replyId}`).set(newReply);
+      } else {
+        if (!localPosts[postId].replies) localPosts[postId].replies = {};
+        localPosts[postId].replies[replyId] = newReply;
+        localStorage.setItem("portal_forum_realtime", JSON.stringify(localPosts));
+        renderPosts();
+      }
+
+      activeReplyPostId = null;
+    }
+
+    function toggleLike(postId) {
+      const isAlreadyLiked = likedPostIds[postId] === true;
+      const delta = isAlreadyLiked ? -1 : 1;
+
+      if (isFirebaseActive && db) {
+        db.ref(`posts/${postId}/likes`).transaction(current => Math.max(0, (current || 0) + delta));
+      } else {
+        if (localPosts[postId]) {
+          localPosts[postId].likes = Math.max(0, (localPosts[postId].likes || 0) + delta);
+          localStorage.setItem("portal_forum_realtime", JSON.stringify(localPosts));
+          renderPosts();
+        }
+      }
+
+      if (isAlreadyLiked) {
+        delete likedPostIds[postId];
+      } else {
+        likedPostIds[postId] = true;
+      }
+      localStorage.setItem("portal_liked_posts", JSON.stringify(likedPostIds));
+      renderPosts();
+    }
+
+    // ★★★ 管理者ワンタップ削除（管理者モード認証済みのため即削除） ★★★
+    function adminDeletePost(postId) {
+      if (confirm("【管理者権限】このスレッドと返信を完全に削除しますか？")) {
+        if (isFirebaseActive && db) {
+          db.ref(`posts/${postId}`).remove();
+        } else {
+          delete localPosts[postId];
+          localStorage.setItem("portal_forum_realtime", JSON.stringify(localPosts));
+          renderPosts();
+        }
+      }
+    }
+
+    function adminDeleteReply(postId, replyId) {
+      if (confirm("【管理者権限】この返信を完全に削除しますか？")) {
+        if (isFirebaseActive && db) {
+          db.ref(`posts/${postId}/replies/${replyId}`).remove();
+        } else {
+          if (localPosts[postId] && localPosts[postId].replies) {
+            delete localPosts[postId].replies[replyId];
+            localStorage.setItem("portal_forum_realtime", JSON.stringify(localPosts));
+            renderPosts();
+          }
+        }
+      }
+    }
+
+    function openReportModal(postId, content) {
+      document.getElementById("reportTargetPostId").value = postId;
+      document.getElementById("reportTargetContent").value = content;
+      document.getElementById("reportDetails").value = "";
+      document.getElementById("reportModal").classList.remove("hidden");
+    }
+
+    function closeReportModal() {
+      document.getElementById("reportModal").classList.add("hidden");
+    }
+
+    function submitReport(e) {
+      e.preventDefault();
+      const postId = document.getElementById("reportTargetPostId").value;
+      const content = document.getElementById("reportTargetContent").value;
+      const reason = document.getElementById("reportReason").value;
+      const details = document.getElementById("reportDetails").value.trim();
+
+      const reportData = {
+        postId,
+        content,
+        reason,
+        details,
+        date: new Date().toLocaleString("ja-JP"),
+        timestamp: Date.now()
+      };
+
+      if (isFirebaseActive && db) {
+        db.ref("reports/" + "rep_" + Date.now()).set(reportData);
+      }
+      alert("通報を受理しました。管理者が確認のうえ適切に対処します。");
+      closeReportModal();
+    }
+
+    function escapeHtml(str) {
+      return (str || "").replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[tag] || tag));
+    }
+
+    function escapeAttr(str) {
+      return (str || "").replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    startListener();
+    updateBanUI();
+  </script>
+</body>
+</html>
