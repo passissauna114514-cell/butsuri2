@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ja" class="scroll-smooth">
+<html lang="ja" class="scroll-smooth overflow-x-hidden">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>学年ポータル | OFFICIAL PORTAL</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -19,49 +19,50 @@
       outline: 1px solid rgba(255, 255, 255, 0.15);
       outline-offset: 2px;
     }
+    /* ロック状態のスタイル */
     .is-locked .locked-cover { display: flex !important; }
     .is-locked .locked-blur { filter: blur(6px); user-select: none; pointer-events: none; }
     .is-unlocked .locked-cover { display: none !important; }
     .is-unlocked .locked-blur { filter: none; user-select: auto; pointer-events: auto; }
   </style>
 </head>
-<body id="top" class="is-locked bg-[#111111] text-neutral-100 antialiased min-h-screen selection:bg-white selection:text-black">
+<body id="top" class="is-locked bg-[#111111] text-neutral-100 antialiased min-h-screen overflow-x-hidden selection:bg-white selection:text-black">
 
-  <!-- 固定ヘッダー -->
-  <header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/90 backdrop-blur border-b border-white/10">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+  <!-- 固定ヘッダー（スマホで絶対に崩れないコンパクト設計） -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-neutral-950/95 backdrop-blur border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex justify-between items-center">
       
-      <!-- 左上：校章 ＋ UNLOCK/ADMINボタン -->
-      <div class="flex items-center gap-4">
-        <a href="#top" class="group flex items-center gap-3 text-white">
-          <div class="emblem-frame w-9 h-9 bg-white p-1 flex items-center justify-center transition duration-300 group-hover:scale-105 group-hover:outline-white">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" class="w-full h-full drop-shadow-sm">
+      <!-- 左側：校章 ＋ タイトル ＋ UNLOCKボタン -->
+      <div class="flex items-center gap-2.5 sm:gap-4">
+        <a href="#top" class="group flex items-center gap-2 sm:gap-3 text-white shrink-0">
+          <div class="emblem-frame w-7 h-7 sm:w-9 sm:h-9 bg-white p-0.5 sm:p-1 flex items-center justify-center transition duration-300 group-hover:scale-105">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" class="w-full h-full">
               <path fill="#000000" d="M250,22 L258,62 L276,68 L296,125 C335,102 385,100 416,128 C448,158 442,202 398,222 C458,235 492,282 476,340 C458,390 392,402 332,375 C345,410 365,445 382,478 C340,460 295,442 250,442 C205,442 160,460 118,478 C135,445 155,410 168,375 C108,402 42,390 24,340 C8,282 42,235 102,222 C58,202 52,158 84,128 C115,100 165,102 204,125 L224,68 L242,62 Z" />
             </svg>
           </div>
-          <span class="text-xs font-mono tracking-[0.25em] uppercase text-neutral-300 group-hover:text-white transition">PORTAL</span>
+          <span class="text-[11px] sm:text-xs font-mono tracking-[0.2em] uppercase text-neutral-300">PORTAL</span>
         </a>
 
-        <!-- 認証ステータスボタン -->
-        <button id="lockStatusBtn" onclick="openAuthModal()" class="flex items-center gap-2 border border-amber-500/60 bg-amber-500/10 text-amber-300 px-3 py-1.5 text-xs font-mono tracking-wider hover:bg-amber-500 hover:text-black transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <!-- UNLOCKボタン（スマホ用に最適化） -->
+        <button id="lockStatusBtn" onclick="openAuthModal()" class="flex items-center gap-1.5 border border-amber-500/60 bg-amber-500/10 text-amber-300 px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-mono tracking-wider hover:bg-amber-500 hover:text-black transition shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
           <span id="lockBtnText">UNLOCK</span>
         </button>
       </div>
 
-      <!-- 右上ナビゲーション -->
-      <nav class="flex items-center gap-6 text-xs font-mono tracking-widest text-neutral-400">
-        <a href="#gateways" class="hover:text-white transition">GATEWAYS</a>
-        <a href="#submit" class="border border-white bg-white text-black px-3.5 py-1.5 font-bold hover:bg-transparent hover:text-white transition">
-          + 情報提供
+      <!-- 右側：ナビ（スマホでは情報提供ボタンのみ表示してスッキリ） -->
+      <div class="flex items-center gap-3">
+        <a href="#gateways" class="hidden md:inline-block text-xs font-mono tracking-widest text-neutral-400 hover:text-white transition">GATEWAYS</a>
+        <a href="#submit" class="border border-white bg-white text-black px-2.5 sm:px-3.5 py-1 text-[11px] sm:text-xs font-bold hover:bg-transparent hover:text-white transition shrink-0">
+          + 提供
         </a>
-      </nav>
+      </div>
     </div>
   </header>
 
 
-  <!-- ① ヒーローセクション -->
-  <section class="relative min-h-screen flex flex-col justify-between pt-24 pb-12 overflow-hidden">
+  <!-- ① ヒーローセクション（スマホでの縦幅・文字バランス最適化） -->
+  <section class="relative min-h-[90vh] sm:min-h-screen flex flex-col justify-between pt-20 sm:pt-24 pb-8 sm:pb-12 overflow-hidden">
     <div class="absolute inset-0 z-0">
       <img 
         src="./KENTAKA.jpg" 
@@ -72,201 +73,232 @@
       <div class="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-black/70"></div>
     </div>
 
-    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center my-auto space-y-6">
-      <span class="inline-block text-xs font-mono tracking-[0.4em] text-neutral-400 uppercase border-b border-neutral-600 pb-1">
+    <!-- 中央コンテンツ -->
+    <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center my-auto space-y-4 sm:space-y-6">
+      <span class="inline-block text-[10px] sm:text-xs font-mono tracking-[0.3em] sm:tracking-[0.4em] text-neutral-400 uppercase border-b border-neutral-600 pb-0.5">
         2026 Academic Information System
       </span>
-      <h1 class="text-4xl sm:text-6xl md:text-7xl font-bold font-serif-en tracking-wider text-white leading-tight">
-        KNOWLEDGE & HORIZON
+      <h1 class="text-3xl sm:text-6xl md:text-7xl font-bold font-serif-en tracking-wider text-white leading-tight">
+        KNOWLEDGE &amp; HORIZON
       </h1>
-      <p class="text-xs sm:text-sm text-neutral-300 font-light tracking-widest max-w-xl mx-auto leading-relaxed">
+      <p class="text-xs sm:text-sm text-neutral-300 font-light tracking-wider max-w-md sm:max-w-xl mx-auto leading-relaxed">
         学年の日々の連絡・考査日程・過去問リポジトリを集約する情報ポータル。
       </p>
       
-      <div class="inline-flex flex-col sm:flex-row items-center gap-3 sm:gap-6 border border-white/20 bg-black/60 backdrop-blur px-8 py-4 mt-2">
-        <span class="text-xs font-mono tracking-widest text-neutral-400 uppercase">Next Exam : 中間考査まで</span>
-        <div class="flex items-baseline gap-2">
-          <span class="text-xs text-neutral-400">あと</span>
-          <span id="countdown" class="text-3xl sm:text-4xl font-bold font-number text-white tracking-wider">--</span>
-          <span class="text-sm text-neutral-300 font-serif">日</span>
+      <!-- カウントダウン枠（スマホでコンパクトに） -->
+      <div class="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-6 border border-white/20 bg-black/60 backdrop-blur px-5 sm:px-8 py-3 sm:py-4 mt-2">
+        <span class="text-[11px] sm:text-xs font-mono tracking-widest text-neutral-400 uppercase">中間考査まで</span>
+        <div class="flex items-baseline gap-1.5 sm:gap-2">
+          <span class="text-[11px] sm:text-xs text-neutral-400">あと</span>
+          <span id="countdown" class="text-2xl sm:text-4xl font-bold font-number text-white tracking-wider">--</span>
+          <span class="text-xs sm:text-sm text-neutral-300 font-serif">日</span>
         </div>
       </div>
     </div>
 
-    <div class="relative z-10 text-center font-mono text-[10px] tracking-[0.3em] text-neutral-400 pt-6">
+    <!-- スクロール誘導 -->
+    <div class="relative z-10 text-center font-mono text-[9px] sm:text-[10px] tracking-[0.3em] text-neutral-400 pt-4">
       <span>SCROLL</span>
-      <div class="w-[1px] h-6 bg-neutral-600 mx-auto mt-2"></div>
+      <div class="w-[1px] h-4 sm:h-6 bg-neutral-600 mx-auto mt-1"></div>
     </div>
   </section>
 
 
-  <!-- ② 直近の重要予定 -->
-  <section class="border-y border-white/20 bg-neutral-950 py-10 px-6 relative">
+  <!-- ② 直近の重要予定（スマホで見やすい縦並びカード） -->
+  <section class="border-y border-white/20 bg-neutral-950 py-8 sm:py-10 px-4 sm:px-6 relative">
     <div class="max-w-6xl mx-auto">
-      <div class="flex justify-between items-end border-b border-white/10 pb-4 mb-6">
+      <div class="flex justify-between items-end border-b border-white/10 pb-3 mb-5">
         <div>
-          <span class="text-[10px] font-mono tracking-[0.3em] text-amber-400 uppercase block mb-1">Upcoming Highlights</span>
-          <h2 class="text-base sm:text-lg font-bold font-serif tracking-wider text-white">直近の重要予定・締め切り</h2>
+          <span class="text-[9px] sm:text-[10px] font-mono tracking-[0.25em] text-amber-400 uppercase block mb-0.5">Highlights</span>
+          <h2 class="text-sm sm:text-lg font-bold font-serif tracking-wider text-white">直近の重要予定・締め切り</h2>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 relative">
-        <div class="relative border border-white/10 bg-neutral-900/60 p-5 flex flex-col justify-between overflow-hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 relative">
+        
+        <!-- 予定カード1 -->
+        <div class="relative border border-white/10 bg-neutral-900/60 p-4 sm:p-5 flex flex-col justify-between overflow-hidden">
           <div class="locked-blur">
-            <div class="flex justify-between items-start mb-2"><span class="text-xs font-mono text-neutral-400">10.15 [THU]</span><span class="text-[10px] font-mono border border-white/30 text-neutral-300 px-2 py-0.5">EXAM</span></div>
-            <h3 class="text-sm font-semibold text-white">英語コミュニケーション 小テスト</h3>
-            <span class="text-[11px] text-neutral-500 font-serif mt-3 block">単語テスト / P.30〜45</span>
+            <div class="flex justify-between items-start mb-1.5">
+              <span class="text-[11px] sm:text-xs font-mono text-neutral-400">10.15 [THU]</span>
+              <span class="text-[9px] sm:text-[10px] font-mono border border-white/30 text-neutral-300 px-1.5 py-0.5">EXAM</span>
+            </div>
+            <h3 class="text-xs sm:text-sm font-semibold text-white">英語コミュニケーション 小テスト</h3>
+            <span class="text-[10px] sm:text-[11px] text-neutral-500 font-serif mt-2 block">単語テスト / P.30〜45</span>
           </div>
-          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/80 backdrop-blur-sm hidden flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-neutral-900/90 transition"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span class="text-[10px] font-mono tracking-widest text-neutral-400 uppercase">LOCKED</span></div>
+          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/80 backdrop-blur-sm hidden flex flex-col items-center justify-center p-3 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span class="text-[9px] font-mono tracking-widest text-neutral-400 uppercase">LOCKED</span>
+          </div>
         </div>
 
-        <div class="relative border border-white/20 bg-neutral-900 p-5 flex flex-col justify-between overflow-hidden">
+        <!-- 予定カード2 -->
+        <div class="relative border border-white/20 bg-neutral-900 p-4 sm:p-5 flex flex-col justify-between overflow-hidden">
           <div class="locked-blur">
-            <div class="flex justify-between items-start mb-2"><span class="text-xs font-mono text-neutral-400">10.18 [SUN] 23:59</span><span class="text-[10px] font-mono bg-white text-black px-2 py-0.5 font-bold">DUE</span></div>
-            <h3 class="text-sm font-semibold text-white">化学基礎 実験レポート提出</h3>
-            <span class="text-[11px] text-neutral-400 font-serif mt-3 block">Classroomにて提出締切</span>
+            <div class="flex justify-between items-start mb-1.5">
+              <span class="text-[11px] sm:text-xs font-mono text-neutral-400">10.18 [SUN] 23:59</span>
+              <span class="text-[9px] sm:text-[10px] font-mono bg-white text-black px-1.5 py-0.5 font-bold">DUE</span>
+            </div>
+            <h3 class="text-xs sm:text-sm font-semibold text-white">化学基礎 実験レポート提出</h3>
+            <span class="text-[10px] sm:text-[11px] text-neutral-400 font-serif mt-2 block">Classroomにて提出締切</span>
           </div>
-          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/80 backdrop-blur-sm hidden flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-neutral-900/90 transition"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span class="text-[10px] font-mono tracking-widest text-neutral-400 uppercase">LOCKED</span></div>
+          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/80 backdrop-blur-sm hidden flex flex-col items-center justify-center p-3 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span class="text-[9px] font-mono tracking-widest text-neutral-400 uppercase">LOCKED</span>
+          </div>
         </div>
 
-        <div class="relative border border-white/10 bg-neutral-900/60 p-5 flex flex-col justify-between overflow-hidden">
+        <!-- 予定カード3 -->
+        <div class="relative border border-white/10 bg-neutral-900/60 p-4 sm:p-5 flex flex-col justify-between overflow-hidden">
           <div class="locked-blur">
-            <div class="flex justify-between items-start mb-2"><span class="text-xs font-mono text-neutral-400">10.20 [TUE]</span><span class="text-[10px] font-mono border border-white/30 text-neutral-300 px-2 py-0.5">EXAM</span></div>
-            <h3 class="text-sm font-semibold text-white">2学期 中間考査（〜10.23）</h3>
-            <span class="text-[11px] text-neutral-500 font-serif mt-3 block">本試験 / 4日間</span>
+            <div class="flex justify-between items-start mb-1.5">
+              <span class="text-[11px] sm:text-xs font-mono text-neutral-400">10.20 [TUE]</span>
+              <span class="text-[9px] sm:text-[10px] font-mono border border-white/30 text-neutral-300 px-1.5 py-0.5">EXAM</span>
+            </div>
+            <h3 class="text-xs sm:text-sm font-semibold text-white">2学期 中間考査（〜10.23）</h3>
+            <span class="text-[10px] sm:text-[11px] text-neutral-500 font-serif mt-2 block">本試験 / 4日間</span>
           </div>
-          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/80 backdrop-blur-sm hidden flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-neutral-900/90 transition"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span class="text-[10px] font-mono tracking-widest text-neutral-400 uppercase">LOCKED</span></div>
+          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/80 backdrop-blur-sm hidden flex flex-col items-center justify-center p-3 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span class="text-[9px] font-mono tracking-widest text-neutral-400 uppercase">LOCKED</span>
+          </div>
         </div>
+
       </div>
     </div>
   </section>
 
 
-  <!-- ③ 本日の重要通達 -->
-  <div class="border-b border-white/10 bg-neutral-900/40 py-3.5 px-6 relative overflow-hidden">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-      <div class="flex items-center gap-3 locked-blur">
-        <span class="font-mono bg-white text-black px-2 py-0.5 font-bold">TODAY</span>
-        <span class="text-neutral-300 font-semibold">【教室移動】3限 数学：第2情報教室へ移動（各自端末持参）</span>
+  <!-- ③ 本日の重要通達（速報ティッカー） -->
+  <div class="border-b border-white/10 bg-neutral-900/40 py-3 px-4 sm:px-6 relative overflow-hidden">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 text-[11px] sm:text-xs">
+      <div class="flex items-center gap-2 locked-blur">
+        <span class="font-mono bg-white text-black px-1.5 py-0.2 font-bold text-[10px]">TODAY</span>
+        <span class="text-neutral-300 truncate">【教室移動】3限 数学：第2情報教室へ移動</span>
       </div>
-      <div class="text-neutral-500 font-mono locked-blur">2026.09.25 UPDATED</div>
+      <div class="text-neutral-500 font-mono text-[10px] sm:text-xs locked-blur shrink-0">毎朝更新</div>
     </div>
-    <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/90 backdrop-blur-sm hidden flex items-center justify-center gap-3 cursor-pointer">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-      <span class="text-xs font-mono text-neutral-400 tracking-wider">本日の伝達事項は保護されています [クリックして解除]</span>
+    <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/90 backdrop-blur-sm hidden flex items-center justify-center gap-2 cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      <span class="text-[11px] font-mono text-neutral-400">本日の伝達事項 [クリックして解除]</span>
     </div>
   </div>
 
 
-  <!-- ④ メインゲートウェイ -->
-  <main class="max-w-6xl mx-auto px-6 py-20 space-y-24">
+  <!-- ④ メインゲートウェイ（スマホで押しやすいカード一覧） -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-16 sm:space-y-24">
 
     <section id="gateways">
-      <div class="flex justify-between items-end border-b border-white/20 pb-3 mb-8">
+      <div class="flex justify-between items-end border-b border-white/20 pb-3 mb-6 sm:mb-8">
         <div>
-          <span class="text-[10px] font-mono tracking-[0.3em] text-neutral-500 uppercase block">Main Gateways</span>
-          <h2 class="text-lg font-bold font-serif tracking-widest text-white">機能・専用サイト一覧</h2>
+          <span class="text-[9px] sm:text-[10px] font-mono tracking-[0.25em] text-neutral-500 uppercase block">Main Gateways</span>
+          <h2 class="text-base sm:text-lg font-bold font-serif tracking-widest text-white">機能・専用サイト一覧</h2>
         </div>
-        <span class="text-xs font-mono text-neutral-500">SELECT EXTERNAL SERVICE</span>
+        <span class="text-[10px] sm:text-xs font-mono text-neutral-500">SERVICES</span>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
 
         <!-- 01：過去問アーカイブ -->
-        <div class="relative border border-white/20 bg-neutral-950 p-8 flex flex-col justify-between min-h-[290px] overflow-hidden">
-          <div class="absolute -right-4 -bottom-8 text-neutral-800/40 font-number text-9xl font-bold select-none pointer-events-none">01</div>
-          <div class="locked-blur relative z-10 space-y-3">
-            <span class="text-[10px] font-mono tracking-widest text-neutral-400 uppercase block">External Archive</span>
-            <h3 class="text-2xl font-bold font-serif-en tracking-wider text-white">PAST EXAMS<br>ARCHIVE</h3>
-            <p class="text-xs text-neutral-400 font-light leading-relaxed max-w-[220px]">過年度の考査・小テスト問題用紙および模範解答データベース。</p>
+        <div class="relative border border-white/20 bg-neutral-950 p-6 sm:p-8 flex flex-col justify-between min-h-[220px] sm:min-h-[280px] overflow-hidden">
+          <div class="absolute -right-3 -bottom-6 text-neutral-800/30 font-number text-8xl sm:text-9xl font-bold select-none pointer-events-none">01</div>
+          <div class="locked-blur relative z-10 space-y-2">
+            <span class="text-[9px] sm:text-[10px] font-mono tracking-widest text-neutral-400 uppercase block">External Archive</span>
+            <h3 class="text-xl sm:text-2xl font-bold font-serif-en tracking-wider text-white">PAST EXAMS<br>ARCHIVE</h3>
+            <p class="text-xs text-neutral-400 font-light leading-relaxed">過年度の考査・小テスト問題用紙および模範解答データベース。</p>
           </div>
-          <a href="https://passissauna114514-cell.github.io/butsuri2/" target="_blank" class="locked-blur relative z-10 pt-6 flex items-center justify-between text-xs font-mono text-white border-t border-white/10 hover:border-white transition">
+          <a href="https://passissauna114514-cell.github.io/butsuri2/" target="_blank" class="locked-blur relative z-10 pt-4 flex items-center justify-between text-xs font-mono text-white border-t border-white/10 hover:border-white transition">
             <span>OPEN SITE</span><span>&rarr;</span>
           </a>
-          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-6 text-center cursor-pointer z-20 hover:bg-neutral-900/90 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-amber-400 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            <span class="text-xs font-bold font-mono tracking-widest text-white mb-1">PROTECTED ARCHIVE</span><span class="text-[10px] text-neutral-400">クリックして解除</span>
+          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-4 text-center cursor-pointer z-20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span class="text-xs font-bold font-mono tracking-widest text-white mb-0.5">PROTECTED</span>
+            <span class="text-[10px] text-neutral-400">タップして解除</span>
           </div>
         </div>
 
-        <!-- 02：学年掲示板（forum.htmlへ直結） -->
-        <div class="relative border border-white/20 bg-neutral-950 p-8 flex flex-col justify-between min-h-[290px] overflow-hidden">
-          <div class="absolute -right-4 -bottom-8 text-neutral-800/40 font-number text-9xl font-bold select-none pointer-events-none">02</div>
-          <div class="locked-blur relative z-10 space-y-3">
-            <span class="text-[10px] font-mono tracking-widest text-neutral-400 uppercase block">Community Site</span>
-            <h3 class="text-2xl font-bold font-serif-en tracking-wider text-white">FORUM &<br>BULLETIN</h3>
-            <p class="text-xs text-neutral-400 font-light leading-relaxed max-w-[220px]">勉強の質問、おすすめ参考書、連絡事項の共有掲示板サイト。</p>
+        <!-- 02：学年掲示板 -->
+        <div class="relative border border-white/20 bg-neutral-950 p-6 sm:p-8 flex flex-col justify-between min-h-[220px] sm:min-h-[280px] overflow-hidden">
+          <div class="absolute -right-3 -bottom-6 text-neutral-800/30 font-number text-8xl sm:text-9xl font-bold select-none pointer-events-none">02</div>
+          <div class="locked-blur relative z-10 space-y-2">
+            <span class="text-[9px] sm:text-[10px] font-mono tracking-widest text-neutral-400 uppercase block">Community Site</span>
+            <h3 class="text-xl sm:text-2xl font-bold font-serif-en tracking-wider text-white">FORUM &amp;<br>BULLETIN</h3>
+            <p class="text-xs text-neutral-400 font-light leading-relaxed">勉強の質問、おすすめ参考書、連絡事項の共有掲示板サイト。</p>
           </div>
-          <a href="./forum.html" class="locked-blur relative z-10 pt-6 flex items-center justify-between text-xs font-mono text-white border-t border-white/10 hover:border-white transition">
+          <a href="./forum.html" class="locked-blur relative z-10 pt-4 flex items-center justify-between text-xs font-mono text-white border-t border-white/10 hover:border-white transition">
             <span>OPEN SITE</span><span>&rarr;</span>
           </a>
-          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-6 text-center cursor-pointer z-20 hover:bg-neutral-900/90 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-amber-400 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            <span class="text-xs font-bold font-mono tracking-widest text-white mb-1">PROTECTED FORUM</span><span class="text-[10px] text-neutral-400">クリックして解除</span>
+          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-4 text-center cursor-pointer z-20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span class="text-xs font-bold font-mono tracking-widest text-white mb-0.5">PROTECTED</span>
+            <span class="text-[10px] text-neutral-400">タップして解除</span>
           </div>
         </div>
 
         <!-- 03：カレンダー -->
-        <div class="relative border border-white/20 bg-neutral-950 p-8 flex flex-col justify-between min-h-[290px] overflow-hidden">
-          <div class="absolute -right-4 -bottom-8 text-neutral-800/40 font-number text-9xl font-bold select-none pointer-events-none">03</div>
-          <div class="locked-blur relative z-10 space-y-3">
-            <span class="text-[10px] font-mono tracking-widest text-neutral-400 uppercase block">Calendar App</span>
-            <h3 class="text-2xl font-bold font-serif-en tracking-wider text-white">ACADEMIC<br>CALENDAR</h3>
-            <p class="text-xs text-neutral-400 font-light leading-relaxed max-w-[220px]">年間・月間の考査日程・提出物締め切りカレンダー専用ページ。</p>
+        <div class="relative border border-white/20 bg-neutral-950 p-6 sm:p-8 flex flex-col justify-between min-h-[220px] sm:min-h-[280px] overflow-hidden">
+          <div class="absolute -right-3 -bottom-6 text-neutral-800/30 font-number text-8xl sm:text-9xl font-bold select-none pointer-events-none">03</div>
+          <div class="locked-blur relative z-10 space-y-2">
+            <span class="text-[9px] sm:text-[10px] font-mono tracking-widest text-neutral-400 uppercase block">Calendar App</span>
+            <h3 class="text-xl sm:text-2xl font-bold font-serif-en tracking-wider text-white">ACADEMIC<br>CALENDAR</h3>
+            <p class="text-xs text-neutral-400 font-light leading-relaxed">年間・月間の考査日程・提出物締め切りカレンダー専用ページ。</p>
           </div>
-          <a href="#" class="locked-blur relative z-10 pt-6 flex items-center justify-between text-xs font-mono text-white border-t border-white/10 hover:border-white transition">
+          <a href="#" class="locked-blur relative z-10 pt-4 flex items-center justify-between text-xs font-mono text-white border-t border-white/10 hover:border-white transition">
             <span>OPEN CALENDAR</span><span>&rarr;</span>
           </a>
-          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-6 text-center cursor-pointer z-20 hover:bg-neutral-900/90 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-amber-400 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            <span class="text-xs font-bold font-mono tracking-widest text-white mb-1">PROTECTED CALENDAR</span><span class="text-[10px] text-neutral-400">クリックして解除</span>
+          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-4 text-center cursor-pointer z-20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span class="text-xs font-bold font-mono tracking-widest text-white mb-0.5">PROTECTED</span>
+            <span class="text-[10px] text-neutral-400">タップして解除</span>
           </div>
         </div>
 
         <!-- 04：1日の予定 -->
-        <div class="relative border border-white/20 bg-neutral-950 p-8 flex flex-col justify-between min-h-[290px] overflow-hidden">
-          <div class="absolute -right-4 -bottom-8 text-neutral-800/40 font-number text-9xl font-bold select-none pointer-events-none">04</div>
-          <div class="locked-blur relative z-10 space-y-3">
-            <span class="text-[10px] font-mono tracking-widest text-neutral-400 uppercase block">Timetable App</span>
-            <h3 class="text-2xl font-bold font-serif-en tracking-wider text-white">DAILY<br>TIMETABLE</h3>
-            <p class="text-xs text-neutral-400 font-light leading-relaxed max-w-[220px]">短縮日課・移動教室・特別時間割のリアルタイム確認ツール。</p>
+        <div class="relative border border-white/20 bg-neutral-950 p-6 sm:p-8 flex flex-col justify-between min-h-[220px] sm:min-h-[280px] overflow-hidden">
+          <div class="absolute -right-3 -bottom-6 text-neutral-800/30 font-number text-8xl sm:text-9xl font-bold select-none pointer-events-none">04</div>
+          <div class="locked-blur relative z-10 space-y-2">
+            <span class="text-[9px] sm:text-[10px] font-mono tracking-widest text-neutral-400 uppercase block">Timetable App</span>
+            <h3 class="text-xl sm:text-2xl font-bold font-serif-en tracking-wider text-white">DAILY<br>TIMETABLE</h3>
+            <p class="text-xs text-neutral-400 font-light leading-relaxed">短縮日課・移動教室・特別時間割のリアルタイム確認ツール。</p>
           </div>
-          <a href="#" class="locked-blur relative z-10 pt-6 flex items-center justify-between text-xs font-mono text-white border-t border-white/10 hover:border-white transition">
+          <a href="#" class="locked-blur relative z-10 pt-4 flex items-center justify-between text-xs font-mono text-white border-t border-white/10 hover:border-white transition">
             <span>OPEN TIMETABLE</span><span>&rarr;</span>
           </a>
-          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-6 text-center cursor-pointer z-20 hover:bg-neutral-900/90 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-amber-400 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            <span class="text-xs font-bold font-mono tracking-widest text-white mb-1">PROTECTED TIMETABLE</span><span class="text-[10px] text-neutral-400">クリックして解除</span>
+          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-4 text-center cursor-pointer z-20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span class="text-xs font-bold font-mono tracking-widest text-white mb-0.5">PROTECTED</span>
+            <span class="text-[10px] text-neutral-400">タップして解除</span>
           </div>
         </div>
 
         <!-- 05：情報提供フォーム -->
-        <a href="#submit" class="group relative border border-white/40 bg-neutral-950 p-8 flex flex-col justify-between min-h-[290px] hover:border-white transition duration-300 overflow-hidden">
-          <div class="absolute -right-4 -bottom-8 text-neutral-800/40 font-number text-9xl font-bold select-none pointer-events-none group-hover:text-neutral-700/60 transition">05</div>
-          <div class="relative z-10 space-y-3">
-            <span class="text-[10px] font-mono tracking-widest text-amber-400 uppercase block">★ WANTED</span>
-            <h3 class="text-2xl font-bold font-serif-en tracking-wider text-white">SUBMIT<br>INFORMATION</h3>
-            <p class="text-xs text-neutral-300 font-light leading-relaxed max-w-[220px]">【情報募集中】テスト範囲・課題の変更などの情報提供フォーム。</p>
+        <a href="#submit" class="group relative border border-white/40 bg-neutral-950 p-6 sm:p-8 flex flex-col justify-between min-h-[220px] sm:min-h-[280px] hover:border-white transition duration-300 overflow-hidden">
+          <div class="absolute -right-3 -bottom-6 text-neutral-800/30 font-number text-8xl sm:text-9xl font-bold select-none pointer-events-none">05</div>
+          <div class="relative z-10 space-y-2">
+            <span class="text-[9px] sm:text-[10px] font-mono tracking-widest text-amber-400 uppercase block">★ WANTED</span>
+            <h3 class="text-xl sm:text-2xl font-bold font-serif-en tracking-wider text-white">SUBMIT<br>INFORMATION</h3>
+            <p class="text-xs text-neutral-300 font-light leading-relaxed">【情報募集中】テスト範囲・課題の変更などの情報提供フォーム。</p>
           </div>
-          <div class="relative z-10 pt-6 flex items-center justify-between text-xs font-mono text-white border-t border-white/20 group-hover:border-white transition">
-            <span>GO TO FORM</span><span class="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
+          <div class="relative z-10 pt-4 flex items-center justify-between text-xs font-mono text-white border-t border-white/20 group-hover:border-white transition">
+            <span>GO TO FORM</span><span>&rarr;</span>
           </div>
         </a>
 
-        <!-- 06：学習アカウントリンクハブ（platforms.htmlへ直結） -->
-        <div class="relative border border-white/20 bg-neutral-950 p-8 flex flex-col justify-between min-h-[290px] overflow-hidden">
-          <div class="absolute -right-4 -bottom-8 text-neutral-800/40 font-number text-9xl font-bold select-none pointer-events-none group-hover:text-neutral-700/60 transition">06</div>
-          <div class="locked-blur relative z-10 space-y-3">
-            <span class="text-[10px] font-mono tracking-widest text-neutral-400 uppercase block">Platform Hub</span>
-            <h3 class="text-2xl font-bold font-serif-en tracking-wider text-white">ACCOUNTS<br>& LMS</h3>
-            <p class="text-xs text-neutral-400 font-light leading-relaxed max-w-[220px]">Classroom・東進POS・マナビジョン・学年Drive集約ページ。</p>
+        <!-- 06：学習アカウントハブ -->
+        <div class="relative border border-white/20 bg-neutral-950 p-6 sm:p-8 flex flex-col justify-between min-h-[220px] sm:min-h-[280px] overflow-hidden">
+          <div class="absolute -right-3 -bottom-6 text-neutral-800/30 font-number text-8xl sm:text-9xl font-bold select-none pointer-events-none">06</div>
+          <div class="locked-blur relative z-10 space-y-2">
+            <span class="text-[9px] sm:text-[10px] font-mono tracking-widest text-neutral-400 uppercase block">Platform Hub</span>
+            <h3 class="text-xl sm:text-2xl font-bold font-serif-en tracking-wider text-white">ACCOUNTS<br>&amp; LMS</h3>
+            <p class="text-xs text-neutral-400 font-light leading-relaxed">Classroom・東進POS・マナビジョン・学年Drive集約ページ。</p>
           </div>
-          <a href="./platforms.html" class="locked-blur relative z-10 pt-6 flex items-center justify-between text-xs font-mono text-white border-t border-white/10 hover:border-white transition">
+          <a href="./platforms.html" class="locked-blur relative z-10 pt-4 flex items-center justify-between text-xs font-mono text-white border-t border-white/10 hover:border-white transition">
             <span>OPEN HUB</span><span>&rarr;</span>
           </a>
-          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-6 text-center cursor-pointer z-20 hover:bg-neutral-900/90 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-amber-400 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            <span class="text-xs font-bold font-mono tracking-widest text-white mb-1">PROTECTED PLATFORMS</span><span class="text-[10px] text-neutral-400">クリックして解除</span>
+          <div onclick="openAuthModal()" class="locked-cover absolute inset-0 bg-neutral-950/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-4 text-center cursor-pointer z-20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span class="text-xs font-bold font-mono tracking-widest text-white mb-0.5">PROTECTED</span>
+            <span class="text-[10px] text-neutral-400">タップして解除</span>
           </div>
         </div>
 
@@ -275,19 +307,18 @@
 
 
     <!-- ⑤ 情報提供募集セクション -->
-    <section id="submit" class="border-2 border-white bg-neutral-950 p-8 sm:p-14 relative overflow-hidden">
-      <div class="absolute right-0 bottom-0 text-white/[0.03] font-number text-9xl font-extrabold select-none pointer-events-none">WANTED</div>
-      <div class="max-w-2xl space-y-6 relative z-10">
+    <section id="submit" class="border-2 border-white bg-neutral-950 p-6 sm:p-14 relative overflow-hidden">
+      <div class="max-w-2xl space-y-4 sm:space-y-6 relative z-10">
         <div>
-          <span class="text-xs font-mono text-neutral-400 uppercase tracking-[0.3em] block mb-2 font-bold">[INFORMATION WANTED]</span>
-          <h3 class="text-2xl sm:text-3xl font-bold font-serif text-white leading-tight">学年の情報提供・更新依頼</h3>
+          <span class="text-[10px] sm:text-xs font-mono text-neutral-400 uppercase tracking-[0.25em] block mb-1.5 font-bold">[INFORMATION WANTED]</span>
+          <h3 class="text-xl sm:text-3xl font-bold font-serif text-white leading-tight">学年の情報提供・更新依頼</h3>
         </div>
         <p class="text-xs sm:text-sm text-neutral-300 leading-relaxed font-light">
-          「先生が言っていた小テスト範囲」「レポートの提出締め切り」「急な教室変更」など、まだここに載っていない情報をご存知の方はぜひ教えてください！<br>
-          <span class="text-neutral-400 text-xs mt-1 block font-mono">※ 匿名OK / Googleアカウント不要 / 10秒で入力完了します。</span>
+          「先生が言っていた小テスト範囲」「レポートの提出締め切り」「急な教室変更」など、まだここに載っていない情報があれば教えてください！<br>
+          <span class="text-neutral-400 text-[11px] sm:text-xs mt-1 block font-mono">※ 匿名OK / Googleアカウント不要 / 10秒で入力完了</span>
         </p>
-        <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-          <a href="#" target="_blank" class="inline-block text-center text-xs font-mono border-2 border-white bg-white text-black px-8 py-4 font-bold hover:bg-transparent hover:text-white transition duration-200 tracking-wider">
+        <div class="pt-2">
+          <a href="#" target="_blank" class="block sm:inline-block text-center text-xs font-mono border-2 border-white bg-white text-black px-6 sm:px-8 py-3.5 sm:py-4 font-bold hover:bg-transparent hover:text-white transition duration-200 tracking-wider">
             情報を提供する (Googleフォーム) &rarr;
           </a>
         </div>
@@ -297,39 +328,39 @@
   </main>
 
 
-  <!-- パスワード認証モーダル -->
-  <div id="authModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-    <div class="bg-neutral-950 border border-white/30 max-w-md w-full p-8 relative space-y-6 shadow-2xl">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-neutral-400 hover:text-white font-mono text-xl">&times;</button>
+  <!-- パスワード認証モーダル（スマホ用全画面対応） -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-neutral-950 border border-white/30 max-w-sm sm:max-w-md w-full p-6 sm:p-8 relative space-y-5 shadow-2xl">
+      <button onclick="closeAuthModal()" class="absolute top-3.5 right-4 text-neutral-400 hover:text-white font-mono text-xl">&times;</button>
       
       <div class="space-y-1">
-        <div class="flex items-center gap-2 text-amber-400 text-xs font-mono tracking-widest uppercase">
+        <div class="flex items-center gap-1.5 text-amber-400 text-[10px] sm:text-xs font-mono tracking-widest uppercase">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
           Authentication Required
         </div>
-        <h3 class="text-xl font-bold font-serif text-white">学年ポータル ロック解除</h3>
+        <h3 class="text-lg sm:text-xl font-bold font-serif text-white">学年ポータル ロック解除</h3>
       </div>
 
       <p class="text-xs text-neutral-400 font-light leading-relaxed">
-        本サイトの予定やアーカイブは関係者限定で公開されています。パスワードを入力してすべての機能を解放してください。
+        関係者用パスワードを入力して全機能を解放してください。
       </p>
 
       <form onsubmit="handleAuth(event)" class="space-y-4">
         <div>
-          <label class="block text-[10px] font-mono text-neutral-400 tracking-widest uppercase mb-1.5">PASSWORD</label>
+          <label class="block text-[10px] font-mono text-neutral-400 tracking-widest uppercase mb-1">PASSWORD</label>
           <input 
             type="password" 
             id="passwordInput" 
             placeholder="パスワードを入力" 
             required 
-            class="w-full bg-neutral-900 border border-neutral-700 text-white px-4 py-3 text-sm focus:border-white outline-none font-mono tracking-widest"
+            class="w-full bg-neutral-900 border border-neutral-700 text-white px-3.5 py-2.5 text-sm focus:border-white outline-none font-mono tracking-widest"
           >
           <span id="authError" class="text-xs text-red-400 mt-1.5 hidden font-mono block">※ パスワードが違います</span>
         </div>
 
-        <div class="pt-2 flex justify-end gap-3">
-          <button type="button" onclick="closeAuthModal()" class="px-4 py-2.5 text-xs font-mono text-neutral-400 hover:text-white">CANCEL</button>
-          <button type="submit" class="border border-white bg-white text-black px-6 py-2.5 text-xs font-mono font-bold hover:bg-transparent hover:text-white transition">UNLOCK &rarr;</button>
+        <div class="pt-1 flex justify-end gap-2.5">
+          <button type="button" onclick="closeAuthModal()" class="px-3 py-2 text-xs font-mono text-neutral-400 hover:text-white">CANCEL</button>
+          <button type="submit" class="border border-white bg-white text-black px-5 py-2 text-xs font-mono font-bold hover:bg-transparent hover:text-white transition">UNLOCK &rarr;</button>
         </div>
       </form>
     </div>
@@ -337,17 +368,17 @@
 
 
   <!-- フッター -->
-  <footer class="border-t border-white/10 bg-black mt-32">
-    <div class="max-w-6xl mx-auto px-6 py-12 flex flex-col sm:flex-row justify-between items-center gap-6 text-xs text-neutral-500 font-mono">
-      <div class="flex items-center gap-3.5">
-        <div class="emblem-frame w-6 h-6 bg-white p-0.5 flex items-center justify-center">
+  <footer class="border-t border-white/10 bg-black mt-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-neutral-500 font-mono">
+      <div class="flex items-center gap-3">
+        <div class="emblem-frame w-5 h-5 sm:w-6 sm:h-6 bg-white p-0.5 flex items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" class="w-full h-full">
             <path fill="#000000" d="M250,22 L258,62 L276,68 L296,125 C335,102 385,100 416,128 C448,158 442,202 398,222 C458,235 492,282 476,340 C458,390 392,402 332,375 C345,410 365,445 382,478 C340,460 295,442 250,442 C205,442 160,460 118,478 C135,445 155,410 168,375 C108,402 42,390 24,340 C8,282 42,235 102,222 C58,202 52,158 84,128 C115,100 165,102 204,125 L224,68 L242,62 Z" />
           </svg>
         </div>
-        <span>2026 ACADEMIC PORTAL</span>
+        <span class="text-[11px] sm:text-xs">2026 ACADEMIC PORTAL</span>
       </div>
-      <span>HOSTED ON GITHUB PAGES</span>
+      <span class="text-[10px] sm:text-xs text-neutral-600">HOSTED ON GITHUB PAGES</span>
     </div>
   </footer>
 
@@ -371,11 +402,11 @@
       
       const btn = document.getElementById("lockStatusBtn");
       if (isAdmin) {
-        btn.className = "flex items-center gap-2 border border-red-500/60 bg-red-500/10 text-red-300 px-3 py-1.5 text-xs font-mono tracking-wider";
-        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg><span>ADMIN MODE</span>`;
+        btn.className = "flex items-center gap-1.5 border border-red-500/60 bg-red-500/10 text-red-300 px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-mono tracking-wider";
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg><span>ADMIN</span>`;
       } else {
-        btn.className = "flex items-center gap-2 border border-emerald-500/60 bg-emerald-500/10 text-emerald-300 px-3 py-1.5 text-xs font-mono tracking-wider";
-        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg><span>UNLOCKED</span>`;
+        btn.className = "flex items-center gap-1.5 border border-emerald-500/60 bg-emerald-500/10 text-emerald-300 px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-mono tracking-wider";
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg><span>UNLOCKED</span>`;
       }
       btn.onclick = relockPortal;
     }
@@ -385,8 +416,8 @@
       document.body.classList.add("is-locked");
 
       const btn = document.getElementById("lockStatusBtn");
-      btn.className = "flex items-center gap-2 border border-amber-500/60 bg-amber-500/10 text-amber-300 px-3 py-1.5 text-xs font-mono tracking-wider hover:bg-amber-500 hover:text-black transition";
-      btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>UNLOCK</span>`;
+      btn.className = "flex items-center gap-1.5 border border-amber-500/60 bg-amber-500/10 text-amber-300 px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-mono tracking-wider hover:bg-amber-500 hover:text-black transition shrink-0";
+      btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="0" ry="0"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>UNLOCK</span>`;
       btn.onclick = openAuthModal;
     }
 
@@ -401,7 +432,6 @@
       document.getElementById("authModal").classList.add("hidden");
     }
 
-    // ★★★ パスワード判定（管理者 sauna114515 / 一般 password123） ★★★
     function handleAuth(e) {
       e.preventDefault();
       const input = document.getElementById("passwordInput").value;
@@ -422,14 +452,14 @@
     }
 
     function relockPortal() {
-      if (confirm("ポータルサイトを再ロックしますか？（管理者モードも解除されます）")) {
+      if (confirm("ポータルサイトを再ロックしますか？")) {
         localStorage.removeItem("portal_unlocked");
         localStorage.removeItem("portal_admin_mode");
         applyLock();
       }
     }
 
-    // カウントダウン処理
+    // カウントダウン処理（2026年10月20日）
     const targetDate = new Date('2026-10-20T00:00:00');
     const now = new Date();
     const diff = targetDate - now;
